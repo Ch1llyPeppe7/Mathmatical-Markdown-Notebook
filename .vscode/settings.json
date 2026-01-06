@@ -1,4 +1,14 @@
 {
   "editor.tabCompletion": "on",
-  "editor.snippetSuggestions": "top"
+  "editor.quickSuggestions": {
+      "other": true,
+      "comments": true,
+      "strings": true
+  },
+  "markdown-preview-enhanced.enableScriptExecution": true,
+  "markdown-preview-enhanced.customStyles": [
+    "file:///D:/File/Research/Markdown/.crossnote/style.less"
+  ]
+
+
 }

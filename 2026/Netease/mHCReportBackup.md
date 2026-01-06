@@ -1,21 +1,71 @@
-<blockquote class="cover-page">
-  <div class="cover-title">残差网络系列研究</div>
-  <blockquote class="cover-subtitle">
-  深度残差、宽度残差与超残差
+<blockquote class="chapter">
+  <blockquote class="section">
+    This is section 1.1
+  <blockquote class="subsection">
+      Subsection 1.1.1
+      <blockquote class="theorem">
+  
+</blockquote>
+      <blockquote class="definition">
+
+</blockquote>
+ <blockquote class="definition">
+
+</blockquote>
   </blockquote>
-  <div class="cover-meta-group">
-    <div class="cover-author">Jin.Qian</div>
-    <div class="cover-date">2026.1.5</div>
-  </div>
+ <blockquote class="section">
+    Section 1.2
+  <blockquote class="subsection">
+      Subsection 1.2.1
+       <blockquote class="definition">
+<blockquote class="theorem">
+  
+</blockquote>
+</blockquote> <blockquote class="definition">
+
+</blockquote>
+  </blockquote>
+
+  </blockquote>
 </blockquote>
 
 <blockquote class="chapter">
+  <blockquote class="section">
+    Section 1.1
+  <blockquote class="subsection">
+      Subsection 1.1.1
+       <blockquote class="definition">
 
- # 残差连接与超连接
+</blockquote>
+  </blockquote>
+ <blockquote class="section">
+    Section 1.2
+  <blockquote class="subsection">
+      Subsection 1.2.1
+      
+  </blockquote>
+
+  </blockquote>
+</blockquote>
+<blockquote class="cover-page">
+  残差网络系列研究
+  <blockquote class="cover-subtitle">
+  深度残差、宽度残差与超残差
+  </blockquote>
+  <blockquote class="cover-meta">
+  2026.1.5,Jin.Qian
+  </blockquote>
+
+</blockquote>
+
+
+ # 1.残差连接与超连接
 给定一个任意$L$层同质深层网络的**层映射**
 
 $$S_l:X_l \rightarrow X_{l+1},$$假设其形式可为
 <blockquote class="definition">
+
+### Definition 1.1
 
   $$\begin{align}
     单纯嵌套：&x_{l+1}=F(x_l,W_l),\\
@@ -36,6 +86,7 @@ ${H_l^{post}},H_l^{pre}\in \mathbb{R}^{1\times n}$分别为嵌入（其对偶形
 
 <blockquote class="remark">
   
+### Remark 1.1
 **残差连接**的初衷是改变层映射的一阶行为，通过增加**恒等映射**以预防梯度消失问题;形式上在零阶行为里**直接混合**了原始特征，可能会带来**特征稀释**的问题，即原始特征主导了**层输出**，使得**特征变换**难以做出贡献。
 **超连接**是残差连接的推广，他将原来的**单一路径**推广到**多路径**，并学习路径两种**混合策略**策略。在**层映射**上同时有多个网络在并行探索，对应地需要学习一组**交换矩阵**（$H^{res}$）实现**横向记忆交换**；在**特征变换**上各子网络记忆被聚合后统一变换，再分发回各网络。
 
@@ -44,12 +95,14 @@ ${H_l^{post}},H_l^{pre}\in \mathbb{R}^{1\times n}$分别为嵌入（其对偶形
 
 <blockquote class="remark">
   
+### Remark 1.2
 **同质性意为网络中任意层映射$S_i$的特征变换$F_i$形式上都是相同的函数**
 
 </blockquote>
 
 <blockquote class="remark">
   
+  ## Remark 1.3
 **超连接的形式像是网络传播方向上的状态空间模型(e.g. Mamba)**,其基本抽象形式为$$\begin{align}
     h_{t+1}&={A}{h_t}+Bu_t,\\
     y_t&=Ch_t+Du_t,\\
@@ -67,9 +120,8 @@ $$\begin{align}
 
 
 </blockquote>
-<blockquote class="chapter">
 
-# 残差流
+# 2.残差流
 **残差流**指深层网络特征增量序列$\set {\Delta x_i}_{1}^{L}$,其中$$\Delta x_i=x_i-x_{i-1}$$单纯嵌套网络的残差流分析较为繁琐；当层映射含有残差连接时，其**特征变换输出量序列**即为**残差流**，这使得我们可以把带残差连接的深层神经网络看作一个**离散步长的动力系统**，通过分析特征变换的谱，可以讨论网络的**收敛性**、**稳定性**等性质以设计更易于训练的网络结构。
 将式$(2)$错位相减可以得到$$\begin{align}
     x_L&=x_l+\sum_{i=l}^{L-1} F(x_i,W_i),\\
@@ -77,7 +129,7 @@ $$\begin{align}
 $$s_l:T_{x_l}X_l\rightarrow T_{S_l(x_l)}X_{l+1},$$其形式为$$s_l(x_l)[v]:= \frac{d}{dt}S_l(x_l+tv)\mid _{t=0}=\frac{\partial x_{l+1}}{\partial x_{l}}\circ v,$$$(1)、(2)、(3)$三种形式选定局部坐标$x_l$后分别对应
 <blockquote class="definition">
   
-
+  ### Definition 2.1
 $$\begin{align}
     s_1(x_l)&=\frac{\partial {F}}{\partial{x_{l}}},\\
         s_2(x_l)&=I+\frac{\partial {F}}{\partial{x_{l}}},\\
@@ -88,7 +140,7 @@ $$\begin{align}
 
 <blockquote class="remark">
   
-
+### Remark 2.1
 在选定局部坐标$x_l$并忽略$H^{pre}_l\circ Expand(x_l)$带来的度量畸变时，$\frac{\partial {F}}{\partial
         (H_l^{pre}\tilde{x_{l}})},\frac{\partial {F}}{\partial{x_{l}}}$具有同源谱结构。
 
@@ -102,7 +154,7 @@ $$\begin{align}
 
 <blockquote class="definition">
   
-
+### Definition 2.2
 
 $$
 \begin{align}
@@ -118,27 +170,22 @@ $$
 
 <blockquote class="remark">
   
-  
+  ## Remark 2.2
 $$J_2\approx exp(\sum _{j=i+1}^{L-1} \frac{\partial {F}}{\partial{x_{j}}})$$
 待补充，可以从丛论角度解释HC
 
 </blockquote>
 
-</blockquote>
-
-<blockquote class="chapter">
 
 
-# 路径范畴
+# 3.路径范畴
 我们不妨讨论网络在空间变换上的作用。
-<blockquote class="section">
-
-## 单纯嵌套深度网络
+## 3.1单纯嵌套深度网络
 对于一个单纯嵌套的$L$层深度网络，其可以看作如下组合映射系统
 
 <blockquote class="definition">
   
-
+  ### Definition 3.1.1
 $$X_0\xrightarrow{F_0} X_1\xrightarrow{F_1}...\xrightarrow{F_{L-1}} X_L,$$
 
 </blockquote>
@@ -147,7 +194,7 @@ $$X_0\xrightarrow{F_0} X_1\xrightarrow{F_1}...\xrightarrow{F_{L-1}} X_L,$$
 
 <blockquote class="definition">
   
-
+  ### Definition 3.1.2
 $$
 X_i\xrightarrow{Emb}Z_0\xrightarrow{\sigma}Z_1\xrightarrow{Prj}X_{i+1},
 $$
@@ -159,18 +206,16 @@ $分别为左嵌入算子和左投影算子，$\sigma$是任意逐点非线性�
 
 <blockquote class="remark">
 
-逐点激活函数导数通常小于1.这是单纯嵌套深度网络梯度消失的根本原因。空间关系暂定，有待商榷。
+**Remark 3.1**：逐点激活函数导数通常小于1.这是单纯嵌套深度网络梯度消失的根本原因。空间关系暂定，有待商榷。
 
 </blockquote>
-</blockquote>
 
-<blockquote class="section">
 
-## 宽度残差深度网络
+## 3.2宽度残差深度网络
 同理，我们先观察$DenseNet$的形态。
 <blockquote class="definition">
   
-
+  ### Definition 3.2.1
 $$
 \begin{align*}
     X_0\xrightarrow{F_0} X_1\xrightarrow{F_1}X_2\xrightarrow{F_2} X_3\xrightarrow{F_3} &X_4\xrightarrow{F_4}...\xrightarrow{F_{L-1}} X_L,\\
@@ -194,17 +239,15 @@ $DenseNet$最后的输出是对所有末端元素进行聚合，如池化、MLP�
 
 <blockquote class="remark">
   
-
+  ### Remark 3.2.1
 来自路径范畴的一个朴素结论是：如果我们规定了每层的特征变换，那么整个网络的复杂行为可以被唯一确定。我们也可以考虑设计一种路径等价类压缩方法来缓解网络过宽的问题。
 </blockquote>
-</blockquote>
-<blockquote class="section">
 
-## 深度残差网络
+## 3.3深度残差网络
 
 <blockquote class="definition">
   
-
+  ### Definition 3.3.1
 $$
 \begin{CD}
 X_0 @>T_0>> X_0+\Delta_0 @>T_1>> X_0+\Delta_0+\Delta_1 @>>> \cdots @>T_{L-1}>>
@@ -217,29 +260,25 @@ $$
 </blockquote>
 <blockquote class="remark">
   
-
+### Remark 3.3.1
 深度残差网络ResNet实际上定义了一种新的系统,特征映射退化为局部坐标到平移向量场的映射，整体的层映射退化为一种扩散行为，本质上牺牲了表达能力(需要更多的层来表示旋转、仿射等变换)换取训练动力、稳定性与收敛性。
-</blockquote>
-</blockquote>
+
 </blockquote>
 
-<blockquote class="chapter">
 
 # 4.向量丛
 这一章用于解释HC的构造。
 ## 4.1底空间，纤维与截面
 
-</blockquote>
-<blockquote class="chapter">
-
-# 超连接残差流的梯度控制问题
+# 5. 超连接残差流的梯度控制问题
 不妨假设我们真的需要HC的网络结构，那么其中的$\mathcal{H}^{Res}_l$带来的梯度流稳定性问题显然是值得考察的。
 ## 5.1 矩阵范数
 下面先介绍几种向量$p$-范数定义的矩阵范数。
 ### 5.1.1 矩阵诱导范数
 反映矩阵作为一个线性变换的特征
 <blockquote class="definition">
-
+  
+  ### Definition 5.1
 \[
 \|A\|_p = \sup_{x \neq 0} \frac{\|Ax\|_p}{\|x\|_p}.
 \]
@@ -248,7 +287,7 @@ $$
 <blockquote class="remark">
 
 
-
+### 特殊情形:
 - \(p = 2\): 谱范数 (最大的奇异值) \(\|A\|_2 = \sigma_{\max}(A)\)  
 - \(p = 1\): 最大列和 \(\|A\|_1 = \max_j \sum_i |A_{ij}|\)  
 - \(p = \infty\): 最大行和 \(\|A\|_\infty = \max_i \sum_j |A_{ij}|\)    
@@ -257,7 +296,7 @@ $$
 
 <blockquote class="theorem">
   
- 
+### Theorem 5.1  
 $$\|A\|_2\le\sqrt{\|A\|_1\|A\|_\infty}$$
 
 </blockquote>
@@ -269,7 +308,7 @@ $$\|A\|_2\le\sqrt{\|A\|_1\|A\|_\infty}$$
 Schatten范数的定义依赖于矩阵的奇异值
 <blockquote class="definition">
   
-
+  ### Definition 5.2
   \[
 \|A\|_{\mathcal S_p} = \left( \sum_{i=1}^{r} \sigma_i(A)^p \right)^{1/p}, \quad 1 \le p < \infty,
 \]其中，\(\sigma_1 \ge \dots \ge \sigma_r\) 是\(A\)的奇异值向量。  
@@ -277,7 +316,7 @@ Schatten范数的定义依赖于矩阵的奇异值
 
 <blockquote class="remark">
   
-
+  ### 特殊情况
 - \(p = 2\): 弗罗贝尼乌斯(Frobenius)范数 \(\|A\|_F = \sqrt{\sum_i \sigma_i^2}\)  
 - \(p = \infty\): 谱范数 \(\|A\|_{\mathcal S_\infty} = \sigma_{\max}(A) = \|A\|_2\)  
 </blockquote>
@@ -290,24 +329,25 @@ Schatten范数的定义依赖于矩阵的奇异值
 </blockquote>
 <blockquote class="definition">
   
-
+  ### Definition 5.0
   $\mathcal{D}_n:=\set {\mathcal{A}\in \mathbb{R}^{n\times n}|\forall i,j\in \mathbb{Z}_n,\boldsymbol{1}^T\mathcal{A_{·j}}=\mathcal{A}_{i·}\boldsymbol{1}=1,\mathcal{A}_{ij}\ge0}$
 </blockquote>
 
 
 <blockquote class="theorem">
   
- Birkhoff-Von Neumann Theorem
+  ### Birkhoff-Von Neumann Theorem
   $$\mathcal{D}_n=conv\set{\Pi_n},其中\Pi_n:=\set{P\in \mathcal{D}_n|P_{ij}\in \mathbb{Z}_2}$$$\mathcal{D}_n$是含$n!$个$P_i\in\Pi_n$极点的凸多面体。
 
 
 </blockquote>
 
-<blockquote class="property">
+<blockquote class="example">
   
+  ### Property
 
   $$\begin{align*}
-    &dim(\mathcal{D}_n)=n^2-(2n-1)=(n-1)^2,n>2时\mathcal{D}_n不是单纯形,\\\
+    &dim(\mathcal{D}_n)=n^2-(2n-1)=(n-1)^2,n>2时\mathcal{D}_n不是单纯形\\\
     &(\mathcal{D}_n,·)是一个关于矩阵乘法的\bold{幺半群},单位元是I_n,\\
     &置换矩阵群(\Pi_n,·)\cong(S_n,\circ)是(\mathcal{D}_n,·)的\bold{单位群},\\
     &根据\bold{Theorem 5.1},谱范数\|\mathcal{A}\|_2\le1\\
@@ -325,6 +365,7 @@ Schatten范数的定义依赖于矩阵的奇异值
 <blockquote class="remark">
 
 
+###  结论
 不难看出，双随机矩阵的矩阵诱导-1范数和矩阵诱导-无穷范数均为1，其谱范数上确界为1；其次，双随机矩阵流形是闭合的，其上任意元素关于矩阵乘法复合仍为双随机矩阵，从而保证了式$(13)$中第一项复合算子作用是不会发散的。我们还可以再详细讨论双随机矩阵的代数、闭合性、有界性、紧致性，并探索$End(n)$中是否存在其他乘法子群也具有这样的谱特征。
  
 
@@ -350,9 +391,7 @@ $$\begin{align*}
 
 ### 5.2.1 Sinkhorn算法
 我们首先考虑在双边边际均为1的最优传输问题中，Sinkhorn构造$\mathcal{A}\in \mathcal{D}_n^{\circ}$的方案。
-<blockquote class="algorithm">
-
-**Entropy-Regularized Sinkhorn**
+**Algorithm 1: Entropy-Regularized Sinkhorn**
 
 | Step | Description |
 |---|---|
@@ -363,7 +402,6 @@ $$\begin{align*}
 |  | \(u \leftarrow \boldsymbol{1} \oslash (K v)\) |
 |  | \(v \leftarrow \boldsymbol{1} \oslash (K^\top u)\) |
 | Output | \(\mathcal{A} = \mathrm{diag}(u) K \mathrm{diag}(v)\) |
-</blockquote>
 
 其中，$\oslash$是逐元素除法。
 **Remark:** \(\mathcal{A}\) is the solution of the entropy-regularized optimal transport problem:
@@ -388,5 +426,3 @@ $$\begin{align*}
 
 通常$\alpha$取自然底数$e$,$\tau$是温度系数,注意到$(15)$的导数是有界的。
 我们考虑Sinkhorn对应的优化目标，根据最大熵原理，其中元素级熵正则的作用是使得$\mathcal{A}$逼近一个均匀双随机矩阵$\mathcal{A}_{Uni}=\frac{1}{n}\boldsymbol{1}\boldsymbol{1}^T$
-
-</blockquote>
