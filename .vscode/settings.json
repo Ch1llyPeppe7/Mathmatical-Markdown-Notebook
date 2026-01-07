@@ -5,6 +5,15 @@
     "comments": true,
     "strings": false
   },
+  "[markdown]": {
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": true,
+      "strings": true
+    },
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.snippetSuggestions": "top"
+  },
   "markdown-preview-enhanced.enableScriptExecution": true,
   "markdown-preview-enhanced.customStyles": [
     "file:///D:/File/Research/Markdown/.crossnote/style.less"

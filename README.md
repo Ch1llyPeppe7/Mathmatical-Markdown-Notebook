@@ -1,296 +1,276 @@
-# Markdown Preview Enhanced LaTeX 样式配置
+# Markdown 学术笔记系统
 
-本目录包含用于将 Markdown Preview Enhanced 样式设置为接近 LaTeX 环境的配置文件，包括 LaTeX 风格的定理环境、快速导航和代码折叠功能。
+基于 Markdown Preview Enhanced 和 Crossnote 的 LaTeX 风格学术笔记系统，支持自动编号、丰富的定理环境、优雅的排版和 PDF 导出。
 
-## 📁 文件说明
+## ✨ 主要特性
 
-- `.mpe/config.json`: Markdown Preview Enhanced 的主配置文件
-- `.mpe/latex-style.css`: LaTeX 风格的自定义 CSS 样式表
-- `.vscode/settings.json`: VSCode 编辑器设置
-- `.vscode/markdown.code-snippets`: 代码片段（Tab 自动补全）
+- 📚 **LaTeX 风格排版**：接近 LaTeX 论文的视觉效果
+- 🔢 **自动编号系统**：Chapter、Section、Subsection 及各类定理环境自动编号
+- 🎨 **丰富的块类型**：支持 17+ 种不同类型的学术块（定义、定理、引理、命题等）
+- 📄 **扉页系统**：专业的封面页设计
+- 🔬 **数学公式优化**：块内公式自动放大，CD 环境自适应
+- 🖨️ **Prince PDF 导出**：支持高质量 PDF 导出，保留所有背景色
+- ⚡ **代码片段补全**：快速插入各类块结构
+- 📐 **响应式布局**：充分利用页面空间
+
+## 📁 项目结构
+
+```
+.
+├── .crossnote/              # Crossnote 配置目录
+│   ├── style.less          # 主样式文件（LESS）
+│   ├── config.js           # Crossnote 配置
+│   ├── parser.js           # Markdown 解析器扩展
+│   └── head.html           # HTML 头部注入
+├── .MPE/                    # Markdown Preview Enhanced 配置
+│   └── markdown.json       # MPE 代码片段配置
+├── .vscode/                 # VSCode 配置
+│   ├── settings.json       # 编辑器设置
+│   └── markdown.code-snippets  # 代码片段（自动补全）
+└── 2026/                    # 笔记内容目录
+    ├── Medical/            # 医学相关笔记
+    ├── Netease/            # 网易相关笔记
+    └── ...
+```
 
 ## 🚀 快速开始
 
-### 方法 1: 在 Markdown 文件头部添加 front matter
+### 1. 安装依赖
 
-在您的 Markdown 文件开头添加：
+确保已安装以下 VSCode 扩展：
+- **Markdown Preview Enhanced** (shd101wyy.markdown-preview-enhanced)
+- **Crossnote** (推荐，用于更好的预览体验)
 
-```yaml
----
-title: 您的文档标题
-math: mathjax
-style: .mpe/latex-style.css
----
-```
+### 2. 使用代码片段
 
-### 方法 2: 使用全局配置
+在 Markdown 文件中输入 `blk` 然后按 `Tab`，选择块类型即可快速插入。
 
-配置文件 `.mpe/config.json` 已经设置为全局默认配置，会自动应用到所有 Markdown 文件。
-
-## 🎨 快速插入（Tab 自动补全）
-
-### 📚 书籍结构
-
-| 输入 | 容器 | 说明 |
-|------|------|------|
-| `title` + Tab | 封面/标题页 | 书名、作者、日期等信息 |
-| `ch` + Tab | 章节 (Chapter) | 第 X 章 |
-| `sec` + Tab | 节 (Section) | 第 X 节 |
-| `subsec` + Tab | 小节 (Subsection) | 第 X.X 小节 |
-| `subsubsec` + Tab | 子小节 (Subsubsection) | 第 X.X.X 子小节 |
-
-### 📐 定理环境
-
-| 输入 | 环境 | 颜色 | 用途 |
-|------|------|------|------|
-| `thm` + Tab | 定理 (Theorem) | 🔵 蓝色 | 主要定理 |
-| `lem` + Tab | 引理 (Lemma) | 🟢 绿色 | 辅助引理 |
-| `proof` + Tab | 证明 (Proof) | 🟠 橙色 | 证明过程 |
-| `def` + Tab | 定义 (Definition) | 🟣 紫色 | 定义概念 |
-| `prop` + Tab | 命题 (Proposition) | 🔵 青色 | 命题陈述 |
-| `cor` + Tab | 推论 (Corollary) | 🔵 深蓝 | 推论结果 |
-| `ex` + Tab | 例子 (Example) | 🔴 粉色 | 示例说明 |
-| `rem` + Tab | 备注 (Remark) | ⚫ 灰色 | 备注说明 |
-| `thm-fold` + Tab | 可折叠定理 | 🔵 蓝色 | 长内容定理 |
-| `rem-fold` + Tab | 可折叠备注 | ⚫ 灰色 | 长内容备注 |
-
-## 📋 基本语法
-
-### 书籍封面/标题页
+### 3. 创建扉页
 
 ```markdown
-<div class="book-title-page">
-<div class="book-title">书名</div>
-<div class="book-subtitle">副标题（可选）</div>
-<div class="book-author">作者姓名</div>
-<div class="book-date">日期</div>
-<div class="book-institution">机构（可选）</div>
-<div class="book-metadata">
-<p><strong>版本：</strong>1.0</p>
-<p><strong>日期：</strong>2026年1月</p>
-</div>
-</div>
+<blockquote class="cover-page">
+  <div class="cover-title">文档标题</div>
+  <blockquote class="cover-subtitle">
+  副标题
+  </blockquote>
+  <div class="cover-meta-group">
+    <div class="cover-author">作者姓名</div>
+    <div class="cover-date">2026.1.15</div>
+  </div>
+</blockquote>
 ```
+
+## 📐 支持的块类型
 
 ### 书籍结构
 
-```markdown
-<!-- 章节 -->
-<div class="book-chapter book-chapter-break" data-number="1">
-<div class="book-chapter-title">章节标题</div>
-</div>
+| 块类型 | 自动标题格式 | 说明 |
+|--------|------------|------|
+| `chapter` | Chapter X | 章节 |
+| `section` | Section X.Y | 节 |
+| `subsection` | Subsection X.Y.Z | 小节 |
 
-<!-- 节 -->
-<div class="book-section" data-number="1">
-<div class="book-section-title">节标题</div>
-</div>
+### 定理环境
 
-<!-- 小节 -->
-<div class="book-subsection" data-number="1.1">
-<div class="book-subsection-title">小节标题</div>
-</div>
+| 块类型 | 自动标题格式 | 颜色 | 用途 |
+|--------|------------|------|------|
+| `definition` | Definition X.Y | 🟢 绿色 | 定义 |
+| `theorem` | Theorem X.Y | 🔵 蓝色 | 定理 |
+| `lemma` | Lemma X.Y | 🟢 绿色 | 引理 |
+| `proposition` | Proposition X.Y | 🔵 浅蓝 | 命题 |
+| `property` | Property X.Y | 🟣 紫色 | 性质 |
+| `assumption` | Assumption X.Y | 🟣 紫色 | 假设 |
+| `proposal` | Proposal X.Y | 🔵 青色 | 提议 |
+| `proof` | Proof. | 🟣 紫色 | 证明 |
+| `example` | Example X.Y | 🔵 青色 | 例子 |
+| `counterexample` | Counterexample X.Y | 🔴 橙红 | 反例 |
+| `remark` | Remark X.Y | 🟠 橙色 | 备注 |
+| `discussion` | Discussion X.Y | ⚫ 灰色 | 讨论 |
+| `algorithm` | Algorithm X.Y | 🔵 蓝色 | 算法 |
+| `objective` | Objective X.Y | 🟠 橙色 | 目标 |
 
-<!-- 子小节 -->
-<div class="book-subsubsection" data-number="1.1.1">
-<div class="book-subsubsection-title">子小节标题</div>
-</div>
-```
+### 信息提示块
 
-### 定理环境（推荐使用 HTML div 标签）
+| 块类型 | 颜色 | 用途 |
+|--------|------|------|
+| `info` | 🔵 蓝色 | 信息提示 |
+| `warning` | 🔴 红色 | 警告 |
+| `tip` | 🟢 绿色 | 提示 |
 
-```markdown
-<div class="theorem" data-label="1">
-这是定理内容。可以包含数学公式 $E = mc^2$。
-</div>
-```
+## 💡 使用示例
 
-### 可折叠环境（推荐用于长内容）
-
-```markdown
-<details class="theorem">
-<summary><strong>定理 1.</strong> 重要定理标题</summary>
-<div>
-这是定理的详细内容，可以很长很长...
-</div>
-</details>
-```
-
-## ⌨️ 快速导航快捷键
-
-| 快捷键 | 功能 |
-|--------|------|
-| `Ctrl+Shift+O` | 跳转到符号（快速找到定理、引理等） |
-| `Ctrl+P` | 快速打开文件 |
-| `Ctrl+F` | 在当前文件搜索 |
-| `Ctrl+Shift+F` | 在整个工作区搜索 |
-| `Ctrl+K Ctrl+0` | 折叠所有代码块 |
-| `Ctrl+K Ctrl+J` | 展开所有代码块 |
-| `Ctrl+Shift+[` | 折叠当前块 |
-| `Ctrl+Shift+]` | 展开当前块 |
-
-## 📖 使用示例
-
-### 示例 1: 书籍封面
+### 基本块结构
 
 ```markdown
-<div class="book-title-page">
-<div class="book-title">深度学习数学基础</div>
-<div class="book-subtitle">从线性代数到优化理论</div>
-<div class="book-author">张三</div>
-<div class="book-date">2026年1月</div>
-<div class="book-institution">某某大学</div>
-<div class="book-metadata">
-<p><strong>版本：</strong>1.0</p>
-<p><strong>完成日期：</strong>2026年1月15日</p>
-</div>
-</div>
+<blockquote class="chapter">
+
+# 章节标题
+
+<blockquote class="section">
+
+## 节标题
+
+<blockquote class="definition">
+
+这是定义内容，可以包含数学公式 $E = mc^2$。
+
+$$
+\begin{align}
+x &= a + b \\
+y &= c + d
+\end{align}
+$$
+
+</blockquote>
+
+</blockquote>
+</blockquote>
 ```
 
-### 示例 2: 书籍结构
+### 数学公式
+
+- **行内公式**：`$...$` - 在 Chapter/Section/Subsection 中保持正常大小
+- **块级公式**：`$$...$$` - 在定理环境中自动放大
+- **CD 环境**：`\begin{CD}...\end{CD}` - 自动适应容器宽度
+
+### 扉页示例
 
 ```markdown
-<div class="book-chapter book-chapter-break" data-number="1">
-<div class="book-chapter-title">线性代数基础</div>
-</div>
-
-<div class="book-section" data-number="1">
-<div class="book-section-title">向量空间</div>
-</div>
-
-<div class="book-subsection" data-number="1.1">
-<div class="book-subsection-title">向量的定义</div>
-</div>
+<blockquote class="cover-page">
+  <div class="cover-title">残差网络系列研究</div>
+  <blockquote class="cover-subtitle">
+  深度残差、宽度残差与超残差
+  </blockquote>
+  <div class="cover-meta-group">
+    <div class="cover-author">Jin.Qian</div>
+    <div class="cover-date">2026.1.15</div>
+  </div>
+</blockquote>
 ```
 
-### 示例 3: 基本定理
+## 🎨 样式定制
 
-```markdown
-<div class="theorem" data-label="1">
-设 $f: \mathbb{R} \to \mathbb{R}$ 是连续函数，则 $f$ 在闭区间 $[a,b]$ 上一致连续。
-</div>
+所有样式定义在 `.crossnote/style.less` 文件中，使用 CSS 变量进行统一管理：
+
+### 字体大小
+
+```less
+--font-size-body: 12.5px;           // 正文大小
+--font-size-block-title: 20px;      // 块标题大小
+--font-size-chapter-title: 22px;    // Chapter 标题大小
+--font-size-section-title: 18px;     // Section 标题大小
+--font-size-h1: 19px;               // Markdown # 标题大小
 ```
 
-### 示例 4: 带证明的定理
+### 颜色定制
 
-```markdown
-<div class="theorem" data-label="2">
-如果 $n$ 是大于 2 的整数，则 $x^n + y^n = z^n$ 没有正整数解。
-</div>
-
-<div class="proof">
-这是著名的费马大定理的证明...
-</div>
+```less
+--color-def: #2e7d32;        // Definition 颜色
+--color-thm: #1565c0;        // Theorem 颜色
+--color-lemma: #4caf50;      // Lemma 颜色
+// ... 更多颜色变量
 ```
 
-### 示例 5: 可折叠的备注
+修改这些变量即可全局调整样式。
 
-```markdown
-<details class="remark">
-<summary><strong>备注 1.</strong> 关于收敛性</summary>
-<div>
-这里可以写很长的备注内容，包括：
-- 详细说明
-- 数学公式
-- 多个段落
-</div>
-</details>
+## 🖨️ PDF 导出
+
+### 使用 Prince 导出
+
+1. 在 Markdown Preview Enhanced 中打开预览
+2. 右键 → `Chrome (Puppeteer)` → `PDF`
+3. 或使用 Prince XML 进行高质量导出
+
+### PDF 导出特性
+
+- ✅ 保留所有背景色
+- ✅ 自动分页（Chapter 自动新页）
+- ✅ 优化的页面布局
+- ✅ 数学公式正确渲染
+- ✅ CD 环境自适应容器
+
+## ⌨️ 代码片段
+
+### 快速插入块
+
+输入 `blk` + `Tab`，然后选择块类型：
+
+```
+blk → <blockquote class="[选择类型]">
 ```
 
-## 🔍 搜索技巧
+### 支持的块类型
 
-- 搜索所有定理：`class="theorem"`
-- 搜索所有备注：`class="remark"`
-- 搜索所有证明：`class="proof"`
-- 使用正则表达式：`class="(theorem|lemma|proof)"`
+所有块类型都在代码片段的下拉菜单中，按逻辑顺序排列。
 
-## 🎯 样式特点
+## 📝 标题大小关系
 
-- **字体**: 使用 Latin Modern Roman 和 Crimson Pro 等 LaTeX 风格字体
-- **页面布局**: 类似 LaTeX 文档的边距和排版（800px 最大宽度，2.5cm 边距）
-- **数学公式**: 使用 MathJax 渲染，支持行内和块级公式
-- **段落**: 两端对齐，中文段落首行缩进
-- **标题**: LaTeX 风格的标题样式，一级标题带下划线
-- **表格**: 带边框的表格样式
-- **定理环境**: 8 种不同颜色的定理环境，带色块和自动编号
+自动生成的标题大小遵循以下层级关系：
 
-## 🛠️ 自定义样式
-
-如需修改颜色或样式，编辑 `.mpe/latex-style.css` 文件中对应的 CSS 类：
-
-- `.theorem` - 定理样式（蓝色）
-- `.lemma` - 引理样式（绿色）
-- `.proof` - 证明样式（橙色）
-- `.definition` - 定义样式（紫色）
-- `.proposition` - 命题样式（青色）
-- `.corollary` - 推论样式（深蓝色）
-- `.example` - 例子样式（粉色）
-- `.remark` - 备注样式（灰色）
-
-## ⚙️ 注意事项
-
-- 确保已安装 **Markdown Preview Enhanced** 插件
-- 数学公式使用 `$...$` 表示行内公式，`$$...$$` 表示块级公式
-- **重要**: 使用 HTML `<div class="...">` 标签而不是 `::: {.class}` 语法，以确保样式正确显示
-- **重要**: 在文件开头添加 `<script src=".mpe/load-css.js"></script>` 来加载 CSS（见下方说明）
-- 重启 VSCode 或重新加载窗口（`Ctrl+Shift+P` → "Reload Window"）以应用所有设置
-
-## 🎯 CSS 样式加载
-
-### 方法 1：使用 JavaScript 脚本加载（推荐）
-
-在 Markdown 文件的 front matter 之后添加一行：
-
-```html
-<script src=".mpe/load-css.js"></script>
+```
+Chapter 块标题 (22px) 
+  > # Markdown 标题 (19px)
+    > Section 块标题 (18px)
+      > ## Markdown 标题 (17px)
+        > Subsection 块标题 (16px)
+          > ### Markdown 标题 (15px)
 ```
 
-或者使用代码片段：输入 `css-loader` + Tab
+其他块标题（Definition、Theorem 等）：20px
 
-这个脚本会自动加载简化版 CSS 文件（`.mpe/latex-style-simple.css`），如果失败会尝试加载完整版本。
+## 🔧 配置说明
 
-### 方法 2：在 front matter 中使用 style 字段
+### VSCode 设置
 
-```yaml
----
-title: 您的文档标题
-math: mathjax
-style: .mpe/latex-style-simple.css
----
-```
+`.vscode/settings.json` 中已配置：
+- Markdown 文件的代码片段自动补全
+- Markdown Preview Enhanced 的自定义样式路径
+- 快速建议和 Tab 补全
 
-### 方法 3：全局配置（自动应用）
+### Crossnote 配置
 
-配置文件 `.mpe/config.json` 中的 `styles` 数组已经配置为简化版本，会自动应用到所有文件。
+`.crossnote/config.js` - Crossnote 主配置
+`.crossnote/style.less` - 样式文件（LESS 格式）
+`.crossnote/parser.js` - Markdown 解析器扩展
+
+## ⚠️ 注意事项
+
+1. **块类型命名**：使用小写字母，如 `definition` 而不是 `Definition`
+2. **数学公式**：在 Chapter/Section/Subsection 中保持正常大小，在定理环境中自动放大
+3. **CD 环境**：会自动缩小以适应容器，避免超出边界
+4. **Prince 导出**：确保使用最新版本的 Prince XML 以获得最佳效果
+5. **代码片段**：如果自动补全不工作，重启 VSCode 或重新加载窗口
 
 ## 🐛 故障排除
 
+### 代码片段不工作？
+
+1. 检查 `.vscode/markdown.code-snippets` 文件是否存在
+2. 确认 VSCode 设置中 `editor.snippetSuggestions` 为 `"top"`
+3. 重启 VSCode 或重新加载窗口（`Ctrl+Shift+P` → "Reload Window"）
+
 ### 样式不显示？
 
-1. 检查是否使用了 HTML div 标签：`<div class="theorem">` 而不是 `::: {.theorem}`
-2. 确保 CSS 文件路径正确：`.mpe/latex-style.css`
-3. 检查 front matter 中是否引用了样式文件
-4. 重启 Markdown Preview Enhanced 预览窗口
+1. 检查 `.crossnote/style.less` 文件路径是否正确
+2. 确认 Markdown Preview Enhanced 的自定义样式配置
+3. 重启预览窗口
 
-### Tab 自动补全不工作？
+### PDF 导出背景色丢失？
 
-1. 确保代码片段文件存在：`.vscode/markdown.code-snippets`
-2. 在 Markdown 文件中输入前缀后等待提示
-3. 检查 VSCode 设置中的 `editor.snippetSuggestions` 是否为 `"top"`
-
-### 快速导航不工作？
-
-1. 确保已安装 Markdown All in One 插件
-2. 使用 `Ctrl+Shift+O` 打开符号搜索
-3. 在侧边栏打开"大纲"视图
-
-## 📚 示例文件
-
-查看 `.mpe/book-example.md` 获取完整的书籍结构示例，包括：
-- 封面/标题页
-- 章节结构
-- 定理环境的使用
+1. 检查 Prince 版本（建议使用最新版）
+2. 确认样式文件中使用了 `print-color-adjust: exact !important`
+3. 检查是否使用了 `color-mix()`（已改为直接颜色值）
 
 ## 📚 更多资源
 
-- [Markdown Preview Enhanced 官方文档](https://shd101wyy.github.io/markdown-preview-enhanced/)
-- [MathJax 文档](https://www.mathjax.org/)
+- [Markdown Preview Enhanced 文档](https://shd101wyy.github.io/markdown-preview-enhanced/)
+- [Crossnote 文档](https://crossnote.app/)
+- [Prince XML 文档](https://www.princexml.com/doc/)
+
+## 📄 许可证
+
+本项目为个人学术笔记系统，可自由使用和修改。
+
+---
+
+**最后更新**：2026年1月
