@@ -49,6 +49,13 @@
   --color-example: #00695c;
   --color-property: #7b1fa2;
   --color-algorithm: #0288d1;
+  --color-discussion: #666;
+  --color-assumption: #9c27b0;
+  --color-proposal: #009688;
+  --color-lemma: #4caf50;
+  --color-proposition: #00bcd4;
+  --color-counterexample: #ff5722;
+  --color-objective: #ff9800;
   --color-info: #3b82f6;
   --color-warning: #f91616;
   --color-tip: #10b981;
@@ -259,14 +266,21 @@
     example-counter
     remark-counter
     property-counter
-    algorithm-counter;
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter;
 
   counter-increment: chapter-counter;
   font-size: var(--font-size-chapter);
   font-weight: 700;
   text-align: left;
-  margin: 64px 0 32px;
-  padding: 20px 16px;
+  margin: 48px 0 24px 0;
+  padding: 28px 24px;
   background-color: var(--color-chapter-bg);
   border-radius: 6px;
   page-break-before: always;
@@ -292,8 +306,8 @@
   counter-increment: section-counter;
   font-size: var(--font-size-body);
   font-weight: 700;
-  margin: 36px 0 16px;
-  padding: 8px 14px;
+  margin: 32px 0 14px 0;
+  padding: 12px 20px;
   border-left: 4px solid var(--color-section-accent);
   background-color: #ffffff;
   border-radius: 5px;
@@ -318,8 +332,8 @@
   counter-increment: subsection-counter;
   font-size: var(--font-size-body);
   font-weight: 600;
-  margin: 28px 0 12px;
-  padding: 6px 12px;
+  margin: 24px 0 10px 0;
+  padding: 10px 18px;
   border-left: 3px solid var(--color-subsection-accent);
   background-color: #ffffff;
   border-radius: 5px;
@@ -364,6 +378,13 @@
 .markdown-preview blockquote.remark { counter-increment: remark-counter; }
 .markdown-preview blockquote.property { counter-increment: property-counter; }
 .markdown-preview blockquote.algorithm { counter-increment: algorithm-counter; }
+.markdown-preview blockquote.discussion { counter-increment: discussion-counter; }
+.markdown-preview blockquote.assumption { counter-increment: assumption-counter; }
+.markdown-preview blockquote.proposal { counter-increment: proposal-counter; }
+.markdown-preview blockquote.lemma { counter-increment: lemma-counter; }
+.markdown-preview blockquote.proposition { counter-increment: proposition-counter; }
+.markdown-preview blockquote.counterexample { counter-increment: counterexample-counter; }
+.markdown-preview blockquote.objective { counter-increment: objective-counter; }
 
 /* Auto Titles with Chapter Number */
 .markdown-preview blockquote.definition::before {
@@ -384,6 +405,27 @@
 .markdown-preview blockquote.algorithm::before {
   content: "Algorithm " counter(chapter-counter) "." counter(algorithm-counter);
 }
+.markdown-preview blockquote.discussion::before {
+  content: "Discussion " counter(chapter-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.assumption::before {
+  content: "Assumption " counter(chapter-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.proposal::before {
+  content: "Proposal " counter(chapter-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.lemma::before {
+  content: "Lemma " counter(chapter-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.proposition::before {
+  content: "Proposition " counter(chapter-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.counterexample::before {
+  content: "Counterexample " counter(chapter-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.objective::before {
+  content: "Objective " counter(chapter-counter) "." counter(objective-counter);
+}
 .markdown-preview blockquote.proof::before { content: "Proof."; }
 
 /* Title Style - 自动添加的标题字体更大，独立设置大小 */
@@ -393,6 +435,13 @@
 .markdown-preview blockquote.remark::before,
 .markdown-preview blockquote.property::before,
 .markdown-preview blockquote.algorithm::before,
+.markdown-preview blockquote.discussion::before,
+.markdown-preview blockquote.assumption::before,
+.markdown-preview blockquote.proposal::before,
+.markdown-preview blockquote.lemma::before,
+.markdown-preview blockquote.proposition::before,
+.markdown-preview blockquote.counterexample::before,
+.markdown-preview blockquote.objective::before,
 .markdown-preview blockquote.proof::before {
   display: block;
   margin-bottom: 6px;
@@ -408,7 +457,14 @@
 .markdown-preview blockquote.proof,
 .markdown-preview blockquote.remark,
 .markdown-preview blockquote.property,
-.markdown-preview blockquote.algorithm {
+.markdown-preview blockquote.algorithm,
+.markdown-preview blockquote.discussion,
+.markdown-preview blockquote.assumption,
+.markdown-preview blockquote.proposal,
+.markdown-preview blockquote.lemma,
+.markdown-preview blockquote.proposition,
+.markdown-preview blockquote.counterexample,
+.markdown-preview blockquote.objective {
   font-size: var(--font-size-body);
 }
 
@@ -473,6 +529,81 @@
 .markdown-preview blockquote.algorithm { 
   border-color: var(--color-algorithm); 
   background-color: #e1f5fe;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.discussion { 
+  border-color: var(--color-discussion); 
+  background-color: #f5f5f5;
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+.markdown-preview blockquote.discussion * {
+  color: var(--color-text-muted);
+}
+.markdown-preview blockquote.assumption { 
+  border-color: var(--color-assumption); 
+  background-color: #f3e5f5;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.proposal { 
+  border-color: var(--color-proposal); 
+  background-color: #e0f2f1;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.lemma { 
+  border-color: var(--color-lemma); 
+  background-color: #e8f5e9;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.proposition { 
+  border-color: var(--color-proposition); 
+  background-color: #e0f7fa;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.counterexample { 
+  border-color: var(--color-counterexample); 
+  background-color: #ffebee;
+  font-size: var(--font-size-body);
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.markdown-preview blockquote.objective { 
+  border-color: var(--color-objective); 
+  background-color: #fff3e0;
   font-size: var(--font-size-body);
   /* Prince 打印时保留背景色 */
   print-color-adjust: exact !important;
@@ -582,7 +713,7 @@
   box-sizing: border-box;
 }
 
-/* 只在 Definition/Theorem/Remark/Property/Algorithm/Example 等提示块内才放大 */
+/* 只在 Definition/Theorem/Remark/Property/Algorithm/Example/Discussion 等提示块内才放大 */
 .markdown-preview blockquote.definition .katex:not(.katex-display),
 .markdown-preview blockquote.definition mjx-container[display="false"],
 .markdown-preview blockquote.theorem .katex:not(.katex-display),
@@ -594,7 +725,21 @@
 .markdown-preview blockquote.algorithm .katex:not(.katex-display),
 .markdown-preview blockquote.algorithm mjx-container[display="false"],
 .markdown-preview blockquote.example .katex:not(.katex-display),
-.markdown-preview blockquote.example mjx-container[display="false"] {
+.markdown-preview blockquote.example mjx-container[display="false"],
+.markdown-preview blockquote.discussion .katex:not(.katex-display),
+.markdown-preview blockquote.discussion mjx-container[display="false"],
+.markdown-preview blockquote.assumption .katex:not(.katex-display),
+.markdown-preview blockquote.assumption mjx-container[display="false"],
+.markdown-preview blockquote.proposal .katex:not(.katex-display),
+.markdown-preview blockquote.proposal mjx-container[display="false"],
+.markdown-preview blockquote.lemma .katex:not(.katex-display),
+.markdown-preview blockquote.lemma mjx-container[display="false"],
+.markdown-preview blockquote.proposition .katex:not(.katex-display),
+.markdown-preview blockquote.proposition mjx-container[display="false"],
+.markdown-preview blockquote.counterexample .katex:not(.katex-display),
+.markdown-preview blockquote.counterexample mjx-container[display="false"],
+.markdown-preview blockquote.objective .katex:not(.katex-display),
+.markdown-preview blockquote.objective mjx-container[display="false"] {
   font-size: 1.1em;
 }
 
@@ -609,7 +754,21 @@
 .markdown-preview blockquote.algorithm .katex-display,
 .markdown-preview blockquote.algorithm mjx-container[display="true"],
 .markdown-preview blockquote.example .katex-display,
-.markdown-preview blockquote.example mjx-container[display="true"] {
+.markdown-preview blockquote.example mjx-container[display="true"],
+.markdown-preview blockquote.discussion .katex-display,
+.markdown-preview blockquote.discussion mjx-container[display="true"],
+.markdown-preview blockquote.assumption .katex-display,
+.markdown-preview blockquote.assumption mjx-container[display="true"],
+.markdown-preview blockquote.proposal .katex-display,
+.markdown-preview blockquote.proposal mjx-container[display="true"],
+.markdown-preview blockquote.lemma .katex-display,
+.markdown-preview blockquote.lemma mjx-container[display="true"],
+.markdown-preview blockquote.proposition .katex-display,
+.markdown-preview blockquote.proposition mjx-container[display="true"],
+.markdown-preview blockquote.counterexample .katex-display,
+.markdown-preview blockquote.counterexample mjx-container[display="true"],
+.markdown-preview blockquote.objective .katex-display,
+.markdown-preview blockquote.objective mjx-container[display="true"] {
   margin: 8px 0;
   padding: 0;
   font-size: 1.2em;
@@ -636,20 +795,157 @@
   overflow-y: hidden;
 }
 
-/* CD 环境（交换图）自适应 */
+/* CD 环境（交换图）自适应 - 防止超出容器 */
 .markdown-preview .katex-display .katex .cd,
 .markdown-preview mjx-container[display="true"] mjx-math mjx-cd {
-  display: inline-block;
+  display: block;
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  box-sizing: border-box;
 }
 
+/* CD 环境在块内时缩小以适应容器，让右箭头更短 */
+.markdown-preview blockquote .katex-display .katex .cd,
+.markdown-preview blockquote mjx-container[display="true"] mjx-math mjx-cd {
+  font-size: 0.85em;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Definition 和 Theorem 块内的 CD 环境进一步缩小 */
+.markdown-preview blockquote.definition .katex-display .katex .cd,
+.markdown-preview blockquote.definition mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.theorem .katex-display .katex .cd,
+.markdown-preview blockquote.theorem mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.discussion .katex-display .katex .cd,
+.markdown-preview blockquote.discussion mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.assumption .katex-display .katex .cd,
+.markdown-preview blockquote.assumption mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.proposal .katex-display .katex .cd,
+.markdown-preview blockquote.proposal mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.lemma .katex-display .katex .cd,
+.markdown-preview blockquote.lemma mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.proposition .katex-display .katex .cd,
+.markdown-preview blockquote.proposition mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.counterexample .katex-display .katex .cd,
+.markdown-preview blockquote.counterexample mjx-container[display="true"] mjx-math mjx-cd,
+.markdown-preview blockquote.objective .katex-display .katex .cd,
+.markdown-preview blockquote.objective mjx-container[display="true"] mjx-math mjx-cd {
+  font-size: 0.75em;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* CD 环境内容自适应 */
 .markdown-preview .katex-display .katex .cd > *,
 .markdown-preview mjx-container[display="true"] mjx-math mjx-cd > * {
-  max-width: 100%;
   box-sizing: border-box;
+}
+
+/* 确保包含 CD 环境的 katex-display 可以横向滚动 */
+.markdown-preview blockquote .katex-display .cd,
+.markdown-preview blockquote mjx-container[display="true"] mjx-cd {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 确保父容器也支持滚动 */
+.markdown-preview blockquote .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Prince 特定修复 - align 环境防止超出容器宽度 */
+.markdown-preview blockquote .katex-display .katex {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* align 环境在 Prince 中的特殊处理 */
+.markdown-preview blockquote .katex-display .katex .katex-html {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* align 环境的表格容器 - 关键修复 */
+.markdown-preview blockquote .katex-display .katex table {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  table-layout: fixed !important;
+}
+
+/* 确保 align 环境中的所有表格元素都不会超出 */
+.markdown-preview blockquote .katex-display .katex table td,
+.markdown-preview blockquote .katex-display .katex table th {
+  max-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
+/* 特别针对 align 环境的表格行 */
+.markdown-preview blockquote .katex-display .katex table.align,
+.markdown-preview blockquote .katex-display .katex table[class*="align"] {
+  max-width: 100% !important;
+  width: 100% !important;
+  table-layout: fixed !important;
+  box-sizing: border-box !important;
+}
+
+/* Prince 特定的换行和溢出处理 */
+@media print {
+  .markdown-preview blockquote .katex-display {
+    -prince-wrap: avoid-break;
+    -prince-page-break-inside: avoid;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .markdown-preview blockquote .katex-display .katex {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .markdown-preview blockquote .katex-display .katex .katex-html {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* 强制所有表格适应容器 */
+  .markdown-preview blockquote .katex-display .katex table {
+    max-width: 100% !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* 确保表格单元格不会超出 - 使用 max-width: 0 让表格自动适应 */
+  .markdown-preview blockquote .katex-display .katex table td,
+  .markdown-preview blockquote .katex-display .katex table th {
+    max-width: 0 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* 确保 align 环境的容器也不会超出 */
+  .markdown-preview blockquote.definition .katex-display,
+  .markdown-preview blockquote.property .katex-display {
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /* Lists & Math */
