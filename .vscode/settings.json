@@ -17,5 +17,8 @@
   "markdown-preview-enhanced.enableScriptExecution": true,
   "markdown-preview-enhanced.customStyles": [
     "file:///D:/File/Research/Markdown/.crossnote/style.less"
-  ]
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "python-envs.pythonProjects": []
 }

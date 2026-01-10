@@ -4,14 +4,14 @@
 :root {
   /* Fonts - 中文楷体，英文 Times New Roman */
   --font-body: "KaiTi", "楷体", "STKaiti", "Times New Roman", "Times", serif;
-  --font-size-body: 12.5px;
-  --font-size-small: 11.5px;
-  --font-size-tiny: 11px;
+  --font-size-body: 15.5px;
+  --font-size-small: 14px;
+  --font-size-tiny: 12px;
   --font-size-section: 13px;
   --font-size-chapter: 16px;
-  --font-size-cover-title: 30px;
-  --font-size-cover-subtitle: 20px;
-  --font-size-cover-meta: 18px;
+  --font-size-cover-title: 50px;
+  --font-size-cover-subtitle: 40px;
+  --font-size-cover-meta: 30px;
   --line-height-body: 1.5;
   
   /* Block Title Sizes - 块标题大小独立设置，大小关系：Chapter > # > section > ## > subsection > ### */
@@ -324,7 +324,21 @@
 }
 
 .markdown-preview blockquote.section {
-  counter-reset: subsection-counter;
+  counter-reset: 
+    subsection-counter
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter;
   counter-increment: section-counter;
   font-size: var(--font-size-body);
   font-weight: 700;
@@ -351,6 +365,20 @@
 }
 
 .markdown-preview blockquote.subsection {
+  counter-reset:
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter;
   counter-increment: subsection-counter;
   font-size: var(--font-size-body);
   font-weight: 600;
@@ -408,46 +436,130 @@
 .markdown-preview blockquote.counterexample { counter-increment: counterexample-counter; }
 .markdown-preview blockquote.objective { counter-increment: objective-counter; }
 
-/* Auto Titles with Chapter Number */
-.markdown-preview blockquote.definition::before {
+/* Auto Titles - 根据所在层级自适应编号 */
+/* 在subsection内的块：使用subsection编号 */
+.markdown-preview blockquote.subsection blockquote.definition::before {
+  content: "Definition " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.subsection blockquote.theorem::before {
+  content: "Theorem " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.subsection blockquote.example::before {
+  content: "Example " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.subsection blockquote.remark::before {
+  content: "Remark " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.subsection blockquote.property::before {
+  content: "Property " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.subsection blockquote.algorithm::before {
+  content: "Algorithm " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.subsection blockquote.discussion::before {
+  content: "Discussion " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.subsection blockquote.assumption::before {
+  content: "Assumption " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.subsection blockquote.proposal::before {
+  content: "Proposal " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.subsection blockquote.lemma::before {
+  content: "Lemma " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.subsection blockquote.proposition::before {
+  content: "Proposition " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.subsection blockquote.counterexample::before {
+  content: "Counterexample " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.subsection blockquote.objective::before {
+  content: "Objective " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(objective-counter);
+}
+
+/* 在section内的块（但不在subsection内）：使用section编号 */
+.markdown-preview blockquote.section > blockquote.definition::before {
+  content: "Definition " counter(chapter-counter) "." counter(section-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.section > blockquote.theorem::before {
+  content: "Theorem " counter(chapter-counter) "." counter(section-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.section > blockquote.example::before {
+  content: "Example " counter(chapter-counter) "." counter(section-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.section > blockquote.remark::before {
+  content: "Remark " counter(chapter-counter) "." counter(section-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.section > blockquote.property::before {
+  content: "Property " counter(chapter-counter) "." counter(section-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.section > blockquote.algorithm::before {
+  content: "Algorithm " counter(chapter-counter) "." counter(section-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.section > blockquote.discussion::before {
+  content: "Discussion " counter(chapter-counter) "." counter(section-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.section > blockquote.assumption::before {
+  content: "Assumption " counter(chapter-counter) "." counter(section-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.section > blockquote.proposal::before {
+  content: "Proposal " counter(chapter-counter) "." counter(section-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.section > blockquote.lemma::before {
+  content: "Lemma " counter(chapter-counter) "." counter(section-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.section > blockquote.proposition::before {
+  content: "Proposition " counter(chapter-counter) "." counter(section-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.section > blockquote.counterexample::before {
+  content: "Counterexample " counter(chapter-counter) "." counter(section-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.section > blockquote.objective::before {
+  content: "Objective " counter(chapter-counter) "." counter(section-counter) "." counter(objective-counter);
+}
+
+/* 在chapter内的块（但不在section内）：使用chapter编号（默认情况） */
+.markdown-preview blockquote.chapter > blockquote.definition::before {
   content: "Definition " counter(chapter-counter) "." counter(def-counter);
 }
-.markdown-preview blockquote.theorem::before {
+.markdown-preview blockquote.chapter > blockquote.theorem::before {
   content: "Theorem " counter(chapter-counter) "." counter(thm-counter);
 }
-.markdown-preview blockquote.example::before {
+.markdown-preview blockquote.chapter > blockquote.example::before {
   content: "Example " counter(chapter-counter) "." counter(example-counter);
 }
-.markdown-preview blockquote.remark::before {
+.markdown-preview blockquote.chapter > blockquote.remark::before {
   content: "Remark " counter(chapter-counter) "." counter(remark-counter);
 }
-.markdown-preview blockquote.property::before {
+.markdown-preview blockquote.chapter > blockquote.property::before {
   content: "Property " counter(chapter-counter) "." counter(property-counter);
 }
-.markdown-preview blockquote.algorithm::before {
+.markdown-preview blockquote.chapter > blockquote.algorithm::before {
   content: "Algorithm " counter(chapter-counter) "." counter(algorithm-counter);
 }
-.markdown-preview blockquote.discussion::before {
+.markdown-preview blockquote.chapter > blockquote.discussion::before {
   content: "Discussion " counter(chapter-counter) "." counter(discussion-counter);
 }
-.markdown-preview blockquote.assumption::before {
+.markdown-preview blockquote.chapter > blockquote.assumption::before {
   content: "Assumption " counter(chapter-counter) "." counter(assumption-counter);
 }
-.markdown-preview blockquote.proposal::before {
+.markdown-preview blockquote.chapter > blockquote.proposal::before {
   content: "Proposal " counter(chapter-counter) "." counter(proposal-counter);
 }
-.markdown-preview blockquote.lemma::before {
+.markdown-preview blockquote.chapter > blockquote.lemma::before {
   content: "Lemma " counter(chapter-counter) "." counter(lemma-counter);
 }
-.markdown-preview blockquote.proposition::before {
+.markdown-preview blockquote.chapter > blockquote.proposition::before {
   content: "Proposition " counter(chapter-counter) "." counter(proposition-counter);
 }
-.markdown-preview blockquote.counterexample::before {
+.markdown-preview blockquote.chapter > blockquote.counterexample::before {
   content: "Counterexample " counter(chapter-counter) "." counter(counterexample-counter);
 }
-.markdown-preview blockquote.objective::before {
+.markdown-preview blockquote.chapter > blockquote.objective::before {
   content: "Objective " counter(chapter-counter) "." counter(objective-counter);
 }
+
 .markdown-preview blockquote.proof::before { content: "Proof."; }
 
 /* Title Style - 自动添加的标题字体更大，独立设置大小 */
