@@ -7,8 +7,8 @@ echo.
 echo Please ensure conda environment Pytorch is activated
 echo If not, run: conda activate Pytorch
 echo.
-echo Required packages: plotly, kaleido, numpy
-echo Install: pip install plotly kaleido numpy
+echo Required packages: matplotlib, numpy
+echo Install: pip install matplotlib numpy
 echo.
 pause
 echo.

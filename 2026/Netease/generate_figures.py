@@ -1,32 +1,33 @@
 """
 Simplicial Complex Category Notes - Figure Generation Script
-Using plotly for better visualization
-Requires: plotly, kaleido (for PNG export)
-Install: pip install plotly kaleido
+Using matplotlib for PNG export (no external dependencies needed)
+All text in English to avoid font issues
+Requires: matplotlib, numpy
+Install: pip install matplotlib numpy
 """
 
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.patches import Polygon, FancyBboxPatch, FancyArrowPatch, Circle, Ellipse
+from matplotlib.patches import FancyArrow
 import numpy as np
 import os
 
-# Check for kaleido
-try:
-    import kaleido
-except ImportError:
-    print("Warning: kaleido not found. Installing...")
-    print("Please run: pip install kaleido")
-    print("Or: conda install -c conda-forge python-kaleido")
-
 # Create images directory
 os.makedirs('images', exist_ok=True)
+
+# Set matplotlib style for better quality
+plt.style.use('default')
+plt.rcParams['figure.dpi'] = 150
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 10
 
 # ==================== Figure 1: Simplicial Complex (Hypergraph) ====================
 
 def figure1_simplicial_complex():
     """Generate simplicial complex visualization as hypergraph"""
-    fig = go.Figure()
+    fig, ax = plt.subplots(figsize=(10, 8))
     
     # Define vertices (0-simplices)
     vertices = np.array([
@@ -42,32 +43,20 @@ def figure1_simplicial_complex():
         [0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]
     ]
     for face in tetra_faces:
-        x_coords = [vertices[i][0] for i in face] + [vertices[face[0]][0]]
-        y_coords = [vertices[i][1] for i in face] + [vertices[face[0]][1]]
-        fig.add_trace(go.Scatter(
-            x=x_coords, y=y_coords,
-            fill='toself',
-            fillcolor='rgba(100, 150, 255, 0.1)',
-            line=dict(color='rgba(100, 150, 255, 0.3)', width=1),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
+        triangle = Polygon(vertices[face], closed=True, 
+                          facecolor='lightblue', alpha=0.1,
+                          edgecolor='lightblue', linewidth=1)
+        ax.add_patch(triangle)
     
     # Draw 2-simplex (triangles) - more visible
     triangles = [
         [0, 1, 2], [0, 1, 3]
     ]
     for tri in triangles:
-        x_coords = [vertices[i][0] for i in tri] + [vertices[tri[0]][0]]
-        y_coords = [vertices[i][1] for i in tri] + [vertices[tri[0]][1]]
-        fig.add_trace(go.Scatter(
-            x=x_coords, y=y_coords,
-            fill='toself',
-            fillcolor='rgba(100, 150, 255, 0.3)',
-            line=dict(color='rgba(50, 100, 200, 0.8)', width=2),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
+        triangle = Polygon(vertices[tri], closed=True,
+                          facecolor='lightblue', alpha=0.3,
+                          edgecolor='blue', linewidth=2)
+        ax.add_patch(triangle)
     
     # Draw 1-simplex (edges)
     edges = [
@@ -75,375 +64,260 @@ def figure1_simplicial_complex():
         (0, 3), (1, 3), (2, 3)
     ]
     for i, j in edges:
-        fig.add_trace(go.Scatter(
-            x=[vertices[i][0], vertices[j][0]],
-            y=[vertices[i][1], vertices[j][1]],
-            mode='lines',
-            line=dict(color='black', width=2),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
+        ax.plot([vertices[i][0], vertices[j][0]], 
+                [vertices[i][1], vertices[j][1]], 
+                'k-', linewidth=2)
     
     # Draw 0-simplex (vertices)
-    fig.add_trace(go.Scatter(
-        x=vertices[:, 0],
-        y=vertices[:, 1],
-        mode='markers+text',
-        marker=dict(size=20, color='black'),
-        text=labels,
-        textposition='bottom center',
-        textfont=dict(size=14, color='black', family='Arial Black'),
-        showlegend=False,
-        hoverinfo='text',
-        hovertext=[f'Vertex {l}' for l in labels]
-    ))
+    for i, (v, label) in enumerate(zip(vertices, labels)):
+        ax.plot(v[0], v[1], 'ko', markersize=15)
+        ax.text(v[0], v[1]-0.15, label, ha='center', va='top',
+                fontsize=14, fontweight='bold')
     
     # Add dimension labels
-    fig.add_annotation(x=0.5, y=0.3, text="0-dim: vertices", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
-    fig.add_annotation(x=0.5, y=0.5, text="1-dim: edges", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
-    fig.add_annotation(x=0.5, y=0.7, text="2-dim: triangles", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
-    fig.add_annotation(x=0.5, y=0.9, text="3-dim: tetrahedron", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    ax.text(0.5, 0.3, "0-dim: vertices", fontsize=10, 
+            color='gray', style='italic')
+    ax.text(0.5, 0.5, "1-dim: edges", fontsize=10, 
+            color='gray', style='italic')
+    ax.text(0.5, 0.7, "2-dim: triangles", fontsize=10, 
+            color='gray', style='italic')
+    ax.text(0.5, 0.9, "3-dim: tetrahedron", fontsize=10, 
+            color='gray', style='italic')
     
-    fig.update_layout(
-        title=dict(
-            text='Simplicial Complex (Hypergraph Visualization)',
-            x=0.5,
-            font=dict(size=16, family='Arial')
-        ),
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        plot_bgcolor='white',
-        width=800,
-        height=700,
-        margin=dict(l=20, r=20, t=60, b=20)
-    )
+    ax.set_xlim(-0.5, 2.5)
+    ax.set_ylim(-0.5, 2.2)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Simplicial Complex (Hypergraph Visualization)', 
+                 fontsize=16, fontweight='bold', pad=20)
     
-    fig.write_image('images/figure1_simplicial_complex.png', width=800, height=700, scale=2)
+    plt.tight_layout()
+    plt.savefig('images/figure1_simplicial_complex.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 1: Simplicial Complex")
 
 # ==================== Figure 2: BPE Pushout Process (Hypergraph Iteration) ====================
 
 def figure2_bpe_pushout():
     """Generate BPE pushout process: showing hypergraph step-by-step aggregation"""
-    fig = make_subplots(
-        rows=1, cols=4,
-        subplot_titles=('Step 1: Atoms<br>(0-simplices)', 
-                       'Step 2: Add Edges<br>(1-simplices)',
-                       'Step 3: Pushout<br>(Merge to Tokens)',
-                       'Step 4: Higher Dim<br>(2-simplices)'),
-        horizontal_spacing=0.1
-    )
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
     
     atoms = ['a', 'b', 'c', 'd']
     positions = np.array([[0, 0], [1, 0], [2, 0], [3, 0]])
     
     # Step 1: Atoms only
-    for i, (pos, atom) in enumerate(zip(positions, atoms)):
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=30, color='blue'),
-            text=atom,
-            textposition='middle center',
-            textfont=dict(size=12, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=1
-        ))
+    ax = axes[0]
+    for pos, atom in zip(positions, atoms):
+        circle = Circle(pos, 0.3, color='blue', zorder=3)
+        ax.add_patch(circle)
+        ax.text(pos[0], pos[1], atom, ha='center', va='center',
+                fontsize=12, fontweight='bold', color='white', zorder=4)
+    ax.set_xlim(-0.5, 3.5)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 1: Atoms\n(0-simplices)', fontsize=11, fontweight='bold')
     
     # Step 2: Add edges
-    for i, (pos, atom) in enumerate(zip(positions, atoms)):
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=30, color='blue'),
-            text=atom,
-            textposition='middle center',
-            textfont=dict(size=12, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=2
-        ))
-    # Draw edges
+    ax = axes[1]
+    for pos, atom in zip(positions, atoms):
+        circle = Circle(pos, 0.3, color='blue', zorder=3)
+        ax.add_patch(circle)
+        ax.text(pos[0], pos[1], atom, ha='center', va='center',
+                fontsize=12, fontweight='bold', color='white', zorder=4)
     for i in range(len(positions) - 1):
-        fig.add_trace(go.Scatter(
-            x=[positions[i][0], positions[i+1][0]],
-            y=[positions[i][1], positions[i+1][1]],
-            mode='lines',
-            line=dict(color='green', width=4),
-            showlegend=False,
-            row=1, col=2
-        ))
+        ax.plot([positions[i][0], positions[i+1][0]], 
+                [positions[i][1], positions[i+1][1]], 
+                'g-', linewidth=4, zorder=1)
+    ax.set_xlim(-0.5, 3.5)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 2: Add Edges\n(1-simplices)', fontsize=11, fontweight='bold')
     
     # Step 3: Merge to tokens
+    ax = axes[2]
     token_positions = np.array([[0.5, 0], [1.5, 0], [2.5, 0]])
     token_labels = ['ab', 'bc', 'cd']
     for pos, label in zip(token_positions, token_labels):
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=50, color='purple', symbol='ellipse', 
-                        line=dict(width=2, color='purple')),
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=12, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=3
-        ))
+        ellipse = Ellipse(pos, 0.8, 0.4, color='purple', zorder=3)
+        ax.add_patch(ellipse)
+        ax.text(pos[0], pos[1], label, ha='center', va='center',
+                fontsize=12, fontweight='bold', color='white', zorder=4)
     # Show original atoms (faded)
     for pos, atom in zip(positions, atoms):
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers',
-            marker=dict(size=20, color='blue', opacity=0.3),
-            showlegend=False,
-            row=1, col=3
-        ))
+        circle = Circle(pos, 0.2, color='blue', alpha=0.3, zorder=2)
+        ax.add_patch(circle)
+    ax.set_xlim(-0.5, 3.5)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 3: Pushout\n(Merge to Tokens)', fontsize=11, fontweight='bold')
     
     # Step 4: Higher dimension aggregation
+    ax = axes[3]
     big_token_pos = np.array([1.5, 0])
     # Draw triangle (2-simplex)
     triangle_vertices = np.array([[0.5, -0.3], [2.5, -0.3], [1.5, 0.3]])
-    fig.add_trace(go.Scatter(
-        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
-        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
-        fill='toself',
-        fillcolor='rgba(255, 165, 0, 0.5)',
-        line=dict(color='orange', width=2),
-        showlegend=False,
-        row=1, col=4
-    ))
-    fig.add_trace(go.Scatter(
-        x=[big_token_pos[0]], y=[big_token_pos[1]],
-        mode='markers+text',
-        marker=dict(size=40, color='orange'),
-        text='abc',
-        textposition='middle center',
-        textfont=dict(size=12, color='white', family='Arial Black'),
-        showlegend=False,
-        row=1, col=4
-    ))
+    triangle = Polygon(triangle_vertices, closed=True,
+                      facecolor='orange', alpha=0.5,
+                      edgecolor='orange', linewidth=2, zorder=1)
+    ax.add_patch(triangle)
+    circle = Circle(big_token_pos, 0.4, color='orange', zorder=3)
+    ax.add_patch(circle)
+    ax.text(big_token_pos[0], big_token_pos[1], 'abc', ha='center', va='center',
+            fontsize=12, fontweight='bold', color='white', zorder=4)
+    ax.set_xlim(-0.5, 3.5)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 4: Higher Dim\n(2-simplices)', fontsize=11, fontweight='bold')
     
-    # Update layout
-    for i in range(1, 5):
-        fig.update_xaxes(range=[-0.5, 3.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-        fig.update_yaxes(range=[-0.5, 0.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-    
-    fig.update_layout(
-        title=dict(
-            text='BPE Colimit Process: Hypergraph Step-by-Step Aggregation',
-            x=0.5,
-            font=dict(size=14, family='Arial')
-        ),
-        plot_bgcolor='white',
-        width=1600,
-        height=400,
-        margin=dict(l=20, r=20, t=80, b=20)
-    )
-    
-    fig.write_image('images/figure2_bpe_pushout.png', width=1600, height=400, scale=2)
+    plt.suptitle('BPE Colimit Process: Hypergraph Step-by-Step Aggregation',
+                 fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.savefig('images/figure2_bpe_pushout.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 2: BPE Pushout Process")
 
 # ==================== Figure 3: Inverse Splitting Pullback Process ====================
 
 def figure3_inverse_splitting_pullback():
     """Generate inverse splitting pullback process: showing hypergraph step-by-step decomposition"""
-    fig = make_subplots(
-        rows=1, cols=4,
-        subplot_titles=('Step 1: Global Complex<br>(2-simplex)', 
-                       'Step 2: Decompose to Edges<br>(1-simplices)',
-                       'Step 3: Pullback<br>(Filter Clusters)',
-                       'Step 4: Minimal Clusters<br>(Limit Object)'),
-        horizontal_spacing=0.1
-    )
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
     
     # Step 1: 2-simplex (triangle)
+    ax = axes[0]
     triangle_vertices = np.array([[0.5, 0], [2, 0], [1.25, 1.2]])
     labels = ['A', 'B', 'C']
-    
-    fig.add_trace(go.Scatter(
-        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
-        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
-        fill='toself',
-        fillcolor='rgba(255, 165, 0, 0.4)',
-        line=dict(color='orange', width=2),
-        showlegend=False,
-        row=1, col=1
-    ))
-    for i, (v, label) in enumerate(zip(triangle_vertices, labels)):
-        fig.add_trace(go.Scatter(
-            x=[v[0]], y=[v[1]],
-            mode='markers+text',
-            marker=dict(size=30, color='orange'),
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=12, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=1
-        ))
+    triangle = Polygon(triangle_vertices, closed=True,
+                      facecolor='orange', alpha=0.4,
+                      edgecolor='orange', linewidth=2)
+    ax.add_patch(triangle)
+    for v, label in zip(triangle_vertices, labels):
+        circle = Circle(v, 0.15, color='orange', zorder=3)
+        ax.add_patch(circle)
+        ax.text(v[0], v[1], label, ha='center', va='center',
+                fontsize=12, fontweight='bold', color='white', zorder=4)
+    ax.set_xlim(-0.5, 2.5)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 1: Global Complex\n(2-simplex)', fontsize=11, fontweight='bold')
     
     # Step 2: Decompose to edges
+    ax = axes[1]
     edges = [
         (triangle_vertices[0], triangle_vertices[1], 'AB'),
         (triangle_vertices[1], triangle_vertices[2], 'BC'),
         (triangle_vertices[2], triangle_vertices[0], 'CA')
     ]
     for start, end, label in edges:
-        fig.add_trace(go.Scatter(
-            x=[start[0], end[0]],
-            y=[start[1], end[1]],
-            mode='lines+text',
-            line=dict(color='green', width=3),
-            text=[None, label],
-            textposition='top center',
-            textfont=dict(size=10, color='green', family='Arial'),
-            showlegend=False,
-            row=1, col=2
-        ))
+        ax.plot([start[0], end[0]], [start[1], end[1]], 
+                'g-', linewidth=3, zorder=1)
+        mid = (start + end) / 2
+        ax.text(mid[0], mid[1]+0.1, label, ha='center', va='bottom',
+                fontsize=10, color='green', fontweight='bold')
     for v, label in zip(triangle_vertices, labels):
-        fig.add_trace(go.Scatter(
-            x=[v[0]], y=[v[1]],
-            mode='markers+text',
-            marker=dict(size=25, color='orange', opacity=0.6),
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=11, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=2
-        ))
+        circle = Circle(v, 0.12, color='orange', alpha=0.6, zorder=2)
+        ax.add_patch(circle)
+        ax.text(v[0], v[1], label, ha='center', va='center',
+                fontsize=11, fontweight='bold', color='white', zorder=3)
+    ax.set_xlim(-0.5, 2.5)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 2: Decompose to Edges\n(1-simplices)', fontsize=11, fontweight='bold')
     
     # Step 3: Pullback (filter clusters)
+    ax = axes[2]
     clusters = [
         (np.array([0.5, 0.3]), '{A,B}'),
         (np.array([1.25, 0.6]), '{B,C}')
     ]
     for pos, label in clusters:
-        # Draw rectangle for cluster
-        rect_x = [pos[0]-0.3, pos[0]+0.3, pos[0]+0.3, pos[0]-0.3, pos[0]-0.3]
-        rect_y = [pos[1]-0.15, pos[1]-0.15, pos[1]+0.15, pos[1]+0.15, pos[1]-0.15]
-        fig.add_trace(go.Scatter(
-            x=rect_x, y=rect_y,
-            fill='toself',
-            fillcolor='rgba(144, 238, 144, 0.6)',
-            line=dict(color='green', width=2),
-            showlegend=False,
-            row=1, col=3
-        ))
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='text',
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=10, color='black', family='Arial Black'),
-            showlegend=False,
-            row=1, col=3
-        ))
+        rect = FancyBboxPatch((pos[0]-0.3, pos[1]-0.15), 0.6, 0.3,
+                              boxstyle="round,pad=0.05",
+                              facecolor='lightgreen', alpha=0.6,
+                              edgecolor='green', linewidth=2)
+        ax.add_patch(rect)
+        ax.text(pos[0], pos[1], label, ha='center', va='center',
+                fontsize=10, fontweight='bold', color='black')
+    ax.set_xlim(-0.5, 2.5)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 3: Pullback\n(Filter Clusters)', fontsize=11, fontweight='bold')
     
     # Step 4: Minimal clusters
+    ax = axes[3]
     final_clusters = [
         (np.array([0.5, 0.2]), '{A,B}'),
         (np.array([1.25, 0.4]), '{B,C}'),
         (np.array([0.875, 0.8]), '{A}')
     ]
     for pos, label in final_clusters:
-        rect_x = [pos[0]-0.25, pos[0]+0.25, pos[0]+0.25, pos[0]-0.25, pos[0]-0.25]
-        rect_y = [pos[1]-0.12, pos[1]-0.12, pos[1]+0.12, pos[1]+0.12, pos[1]-0.12]
-        fig.add_trace(go.Scatter(
-            x=rect_x, y=rect_y,
-            fill='toself',
-            fillcolor='rgba(173, 216, 230, 0.7)',
-            line=dict(color='blue', width=2),
-            showlegend=False,
-            row=1, col=4
-        ))
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='text',
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=9, color='black', family='Arial Black'),
-            showlegend=False,
-            row=1, col=4
-        ))
+        rect = FancyBboxPatch((pos[0]-0.25, pos[1]-0.12), 0.5, 0.24,
+                              boxstyle="round,pad=0.05",
+                              facecolor='lightblue', alpha=0.7,
+                              edgecolor='blue', linewidth=2)
+        ax.add_patch(rect)
+        ax.text(pos[0], pos[1], label, ha='center', va='center',
+                fontsize=9, fontweight='bold', color='black')
+    ax.set_xlim(-0.5, 2.5)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Step 4: Minimal Clusters\n(Limit Object)', fontsize=11, fontweight='bold')
     
-    # Update layout
-    for i in range(1, 5):
-        fig.update_xaxes(range=[-0.5, 2.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-    
-    fig.update_layout(
-        title=dict(
-            text='Inverse Splitting Limit Process: Hypergraph Step-by-Step Decomposition',
-            x=0.5,
-            font=dict(size=14, family='Arial')
-        ),
-        plot_bgcolor='white',
-        width=1600,
-        height=400,
-        margin=dict(l=20, r=20, t=80, b=20)
-    )
-    
-    fig.write_image('images/figure3_inverse_splitting_pullback.png', width=1600, height=400, scale=2)
+    plt.suptitle('Inverse Splitting Limit Process: Hypergraph Step-by-Step Decomposition',
+                 fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.savefig('images/figure3_inverse_splitting_pullback.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 3: Inverse Splitting Pullback Process")
 
 # ==================== Figure 4: Conjugate Complex Construction ====================
 
 def figure4_conjugate_complex():
     """Generate conjugate complex construction visualization"""
-    fig = make_subplots(
-        rows=1, cols=2,
-        subplot_titles=('Original Complex $K$<br>Vertices=Atoms, Simplices=Tokens',
-                       'Conjugate Complex $K^*$<br>Vertices=Tokens, Simplices=Atom Clusters'),
-        horizontal_spacing=0.15
-    )
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     
     # Left: Original complex K
+    ax = axes[0]
     vertices_k = np.array([[0.5, 0], [1.5, 0], [1, 0.866]])
     labels_k = ['a', 'b', 'c']
     
     # Draw triangle
-    fig.add_trace(go.Scatter(
-        x=list(vertices_k[:, 0]) + [vertices_k[0, 0]],
-        y=list(vertices_k[:, 1]) + [vertices_k[0, 1]],
-        fill='toself',
-        fillcolor='rgba(100, 150, 255, 0.3)',
-        line=dict(color='blue', width=2),
-        showlegend=False,
-        row=1, col=1
-    ))
+    triangle = Polygon(vertices_k, closed=True,
+                      facecolor='lightblue', alpha=0.3,
+                      edgecolor='blue', linewidth=2)
+    ax.add_patch(triangle)
     # Draw edges
     for i in range(3):
-        fig.add_trace(go.Scatter(
-            x=[vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
-            y=[vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
-            mode='lines',
-            line=dict(color='blue', width=2),
-            showlegend=False,
-            row=1, col=1
-        ))
+        ax.plot([vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
+                [vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
+                'b-', linewidth=2)
     # Draw vertices
     for v, label in zip(vertices_k, labels_k):
-        fig.add_trace(go.Scatter(
-            x=[v[0]], y=[v[1]],
-            mode='markers+text',
-            marker=dict(size=25, color='blue'),
-            text=label,
-            textposition='bottom center',
-            textfont=dict(size=11, color='blue', family='Arial Black'),
-            showlegend=False,
-            row=1, col=1
-        ))
-    fig.add_annotation(x=1, y=0.5, text="{a,b,c}", 
-                      showarrow=False, font=dict(size=10, color='blue', style='italic'),
-                      row=1, col=1)
+        circle = Circle(v, 0.12, color='blue', zorder=3)
+        ax.add_patch(circle)
+        ax.text(v[0], v[1]-0.15, label, ha='center', va='top',
+                fontsize=11, fontweight='bold', color='blue')
+    ax.text(1, 0.5, "{a,b,c}", ha='center', va='center',
+            fontsize=10, color='blue', style='italic')
+    ax.set_xlim(-0.3, 2.3)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Original Complex $K$\nVertices=Atoms, Simplices=Tokens',
+                 fontsize=11, fontweight='bold')
     
     # Right: Conjugate complex K*
+    ax = axes[1]
     kstar_vertices = [
         (np.array([0.5, 0.2]), '{a,b}'),
         (np.array([1.5, 0.2]), '{b,c}'),
@@ -451,16 +325,10 @@ def figure4_conjugate_complex():
     ]
     
     for pos, label in kstar_vertices:
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=30, color='purple'),
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=10, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=2
-        ))
+        circle = Circle(pos, 0.15, color='purple', zorder=3)
+        ax.add_patch(circle)
+        ax.text(pos[0], pos[1], label, ha='center', va='center',
+                fontsize=10, fontweight='bold', color='white', zorder=4)
     
     # Draw edges in K*
     edges_kstar = [
@@ -468,62 +336,38 @@ def figure4_conjugate_complex():
         (kstar_vertices[1][0], kstar_vertices[2][0])
     ]
     for start, end in edges_kstar:
-        fig.add_trace(go.Scatter(
-            x=[start[0], end[0]],
-            y=[start[1], end[1]],
-            mode='lines',
-            line=dict(color='purple', width=2, dash='dash'),
-            showlegend=False,
-            row=1, col=2
-        ))
+        ax.plot([start[0], end[0]], [start[1], end[1]],
+                'purple', linewidth=2, linestyle='--', zorder=1)
     
-    fig.add_annotation(x=1, y=0.5, text="Atom Clusters", 
-                      showarrow=False, font=dict(size=10, color='purple', style='italic'),
-                      row=1, col=2)
+    ax.text(1, 0.5, "Atom Clusters", ha='center', va='center',
+            fontsize=10, color='purple', style='italic')
+    ax.set_xlim(-0.3, 2.3)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Conjugate Complex $K^*$\nVertices=Tokens, Simplices=Atom Clusters',
+                 fontsize=11, fontweight='bold')
     
     # Add transformation arrow
-    fig.add_annotation(
-        x=1.5, y=0.5,
-        text="Vertex↔Simplex<br>Reversal",
-        showarrow=True,
-        arrowhead=2,
-        arrowsize=1.5,
-        arrowwidth=3,
-        arrowcolor='red',
-        ax=0, ay=0,
-        font=dict(size=11, color='red', family='Arial Black'),
-        bgcolor='rgba(255, 255, 255, 0.8)',
-        bordercolor='red',
-        borderwidth=2
-    )
+    fig.text(0.5, 0.5, "Vertex↔Simplex\nReversal", 
+             ha='center', va='center', fontsize=12, 
+             fontweight='bold', color='red',
+             bbox=dict(boxstyle='round', facecolor='white', 
+                      edgecolor='red', linewidth=2))
     
-    # Update layout
-    for i in range(1, 3):
-        fig.update_xaxes(range=[-0.3, 2.3], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-    
-    fig.update_layout(
-        title=dict(
-            text='Conjugate Complex Construction: Vertex-Simplex Reversal',
-            x=0.5,
-            font=dict(size=14, family='Arial')
-        ),
-        plot_bgcolor='white',
-        width=1200,
-        height=500,
-        margin=dict(l=20, r=20, t=80, b=20)
-    )
-    
-    fig.write_image('images/figure4_conjugate_complex.png', width=1200, height=500, scale=2)
+    plt.suptitle('Conjugate Complex Construction: Vertex-Simplex Reversal',
+                 fontsize=14, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig('images/figure4_conjugate_complex.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 4: Conjugate Complex Construction")
 
 # ==================== Figure 5: Weighted Directed Complex ====================
 
 def figure5_weighted_directed_complex():
     """Generate weighted directed complex visualization"""
-    fig = go.Figure()
+    fig, ax = plt.subplots(figsize=(10, 8))
     
     # Define node positions (items)
     nodes = {
@@ -535,16 +379,11 @@ def figure5_weighted_directed_complex():
     
     # Draw nodes
     for node_id, pos in nodes.items():
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=40, color='orange', line=dict(width=2, color='darkorange')),
-            text=f'Item {node_id}',
-            textposition='middle center',
-            textfont=dict(size=11, color='white', family='Arial Black'),
-            showlegend=False,
-            name=node_id
-        ))
+        circle = Circle(pos, 0.2, color='orange', 
+                       edgecolor='darkorange', linewidth=2, zorder=3)
+        ax.add_patch(circle)
+        ax.text(pos[0], pos[1], f'Item {node_id}', ha='center', va='center',
+                fontsize=11, fontweight='bold', color='white', zorder=4)
     
     # Define directed edges with weights
     edges = [
@@ -555,7 +394,7 @@ def figure5_weighted_directed_complex():
         (('4', '3'), 0.5)
     ]
     
-    # Draw directed edges with arrows using annotations
+    # Draw directed edges with arrows
     for (start, end), weight in edges:
         start_pos = nodes[start]
         end_pos = nodes[end]
@@ -566,156 +405,104 @@ def figure5_weighted_directed_complex():
         dy_norm = dy / length
         
         # Calculate arrow start and end (avoiding node overlap)
-        arrow_start_x = start_pos[0] + 0.3 * dx_norm
-        arrow_start_y = start_pos[1] + 0.3 * dy_norm
-        arrow_end_x = end_pos[0] - 0.3 * dx_norm
-        arrow_end_y = end_pos[1] - 0.3 * dy_norm
+        arrow_start_x = start_pos[0] + 0.2 * dx_norm
+        arrow_start_y = start_pos[1] + 0.2 * dy_norm
+        arrow_end_x = end_pos[0] - 0.2 * dx_norm
+        arrow_end_y = end_pos[1] - 0.2 * dy_norm
         
-        # Add arrow annotation (plotly handles arrow drawing)
-        fig.add_annotation(
-            x=arrow_end_x,
-            y=arrow_end_y,
-            ax=arrow_start_x,
-            ay=arrow_start_y,
-            arrowhead=2,
-            arrowsize=1.5,
-            arrowwidth=3,
-            arrowcolor='red',
-            showarrow=True,
-            axref='x',
-            ayref='y',
-            xref='x',
-            yref='y'
-        )
+        # Draw arrow
+        arrow = FancyArrowPatch((arrow_start_x, arrow_start_y),
+                                (arrow_end_x, arrow_end_y),
+                                arrowstyle='->', mutation_scale=20,
+                                color='red', linewidth=3, zorder=1)
+        ax.add_patch(arrow)
         
         # Label weight
         mid_x = (start_pos[0] + end_pos[0]) / 2
         mid_y = (start_pos[1] + end_pos[1]) / 2
         offset_x = -0.15 * dy_norm
         offset_y = 0.15 * dx_norm
-        fig.add_annotation(
-            x=mid_x + offset_x,
-            y=mid_y + offset_y,
-            text=f'w={weight}',
-            showarrow=False,
-            font=dict(size=10, color='red', family='Arial Black'),
-            bgcolor='rgba(255, 255, 255, 0.9)',
-            bordercolor='red',
-            borderwidth=1,
-            borderpad=3
-        )
+        ax.text(mid_x + offset_x, mid_y + offset_y, f'w={weight}',
+                ha='center', va='center', fontsize=10, 
+                fontweight='bold', color='red',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
+                         edgecolor='red', linewidth=1))
     
     # Draw 2-simplex (directed triangle)
     triangle_vertices = np.array([nodes['1'], nodes['2'], nodes['3']])
-    fig.add_trace(go.Scatter(
-        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
-        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
-        fill='toself',
-        fillcolor='rgba(0, 255, 0, 0.2)',
-        line=dict(color='green', width=2, dash='dash'),
-        showlegend=False,
-        hoverinfo='skip'
-    ))
-    fig.add_annotation(x=1, y=0.6, text="Directed Triangle<br>(2-simplex)", 
-                      showarrow=False, font=dict(size=9, color='green', style='italic'))
+    triangle = Polygon(triangle_vertices, closed=True,
+                      facecolor='lightgreen', alpha=0.2,
+                      edgecolor='green', linewidth=2, linestyle='--', zorder=0)
+    ax.add_patch(triangle)
+    ax.text(1, 0.6, "Directed Triangle\n(2-simplex)", ha='center', va='center',
+            fontsize=9, color='green', style='italic')
     
-    fig.add_annotation(x=1.5, y=-0.8, text="Directed edges show temporal relations: Item i → Item j", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
-    fig.add_annotation(x=1.5, y=-1.1, text="Weights w represent co-occurrence frequency (AEP convergence)", 
-                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    ax.text(1.5, -0.8, "Directed edges show temporal relations: Item i → Item j",
+            ha='center', va='center', fontsize=10, color='gray', style='italic')
+    ax.text(1.5, -1.1, "Weights w represent co-occurrence frequency (AEP convergence)",
+            ha='center', va='center', fontsize=10, color='gray', style='italic')
     
-    fig.update_layout(
-        title=dict(
-            text='Weighted Directed Complex: From Interaction Sequences to Global Complex',
-            x=0.5,
-            font=dict(size=14, family='Arial')
-        ),
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 3.5]),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-1.5, 2.5]),
-        plot_bgcolor='white',
-        width=1000,
-        height=800,
-        margin=dict(l=20, r=20, t=80, b=100)
-    )
+    ax.set_xlim(-0.5, 3.5)
+    ax.set_ylim(-1.5, 2.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Weighted Directed Complex: From Interaction Sequences to Global Complex',
+                 fontsize=14, fontweight='bold', pad=20)
     
-    fig.write_image('images/figure5_weighted_directed_complex.png', width=1000, height=800, scale=2)
+    plt.tight_layout()
+    plt.savefig('images/figure5_weighted_directed_complex.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 5: Weighted Directed Complex")
 
 # ==================== Figure 6: Conjugate Transformation ====================
 
 def figure6_conjugate_transformation():
     """Generate conjugate complex hypergraph transformation"""
-    fig = make_subplots(
-        rows=1, cols=3,
-        subplot_titles=('Original Complex $K$<br>Vertices=Atoms, Simplices=Tokens',
-                       'Transformation',
-                       'Conjugate Complex $K^*$<br>Vertices=Tokens, Simplices=Atom Clusters'),
-        horizontal_spacing=0.1
-    )
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     
     # Left: Original complex K
+    ax = axes[0]
     vertices_k = np.array([[0.5, 0], [1.5, 0], [1, 0.866]])
     labels_k = ['a', 'b', 'c']
     
-    fig.add_trace(go.Scatter(
-        x=list(vertices_k[:, 0]) + [vertices_k[0, 0]],
-        y=list(vertices_k[:, 1]) + [vertices_k[0, 1]],
-        fill='toself',
-        fillcolor='rgba(100, 150, 255, 0.3)',
-        line=dict(color='blue', width=2),
-        showlegend=False,
-        row=1, col=1
-    ))
+    triangle = Polygon(vertices_k, closed=True,
+                      facecolor='lightblue', alpha=0.3,
+                      edgecolor='blue', linewidth=2)
+    ax.add_patch(triangle)
     for i in range(3):
-        fig.add_trace(go.Scatter(
-            x=[vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
-            y=[vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
-            mode='lines',
-            line=dict(color='blue', width=2),
-            showlegend=False,
-            row=1, col=1
-        ))
+        ax.plot([vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
+                [vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
+                'b-', linewidth=2)
     for v, label in zip(vertices_k, labels_k):
-        fig.add_trace(go.Scatter(
-            x=[v[0]], y=[v[1]],
-            mode='markers+text',
-            marker=dict(size=25, color='blue'),
-            text=label,
-            textposition='bottom center',
-            textfont=dict(size=11, color='blue', family='Arial Black'),
-            showlegend=False,
-            row=1, col=1
-        ))
+        circle = Circle(v, 0.12, color='blue', zorder=3)
+        ax.add_patch(circle)
+        ax.text(v[0], v[1]-0.15, label, ha='center', va='top',
+                fontsize=11, fontweight='bold', color='blue')
+    ax.set_xlim(-0.3, 2.3)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Original Complex $K$\nVertices=Atoms, Simplices=Tokens',
+                 fontsize=11, fontweight='bold')
     
-    # Middle: Transformation arrow (bidirectional)
-    fig.add_annotation(
-        x=1.5, y=0.5,
-        text="Vertex↔Simplex<br>Reversal",
-        showarrow=True,
-        arrowhead=2,
-        arrowsize=1.5,
-        arrowwidth=3,
-        arrowcolor='red',
-        ax=-0.3, ay=0,
-        font=dict(size=11, color='red', family='Arial Black'),
-        bgcolor='rgba(255, 255, 255, 0.9)',
-        bordercolor='red',
-        borderwidth=2,
-        row=1, col=2
-    )
-    # Add reverse arrow
-    fig.add_annotation(
-        x=0.5, y=0.5,
-        showarrow=True,
-        arrowhead=2,
-        arrowsize=1.5,
-        arrowwidth=3,
-        arrowcolor='red',
-        ax=0.3, ay=0,
-        row=1, col=2
-    )
+    # Middle: Transformation arrow
+    ax = axes[1]
+    ax.arrow(0.3, 0.5, 0.4, 0, head_width=0.1, head_length=0.1,
+             fc='red', ec='red', linewidth=3, zorder=2)
+    ax.arrow(0.7, 0.5, -0.4, 0, head_width=0.1, head_length=0.1,
+             fc='red', ec='red', linewidth=3, zorder=2)
+    ax.text(0.5, 0.5, "Vertex↔Simplex\nReversal", ha='center', va='center',
+            fontsize=12, fontweight='bold', color='red',
+            bbox=dict(boxstyle='round', facecolor='white',
+                     edgecolor='red', linewidth=2))
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect('equal')
+    ax.axis('off')
     
     # Right: Conjugate complex K*
+    ax = axes[2]
     kstar_vertices = [
         (np.array([0.5, 0.2]), '{a,b}'),
         (np.array([1.5, 0.2]), '{b,c}'),
@@ -723,51 +510,32 @@ def figure6_conjugate_transformation():
     ]
     
     for pos, label in kstar_vertices:
-        fig.add_trace(go.Scatter(
-            x=[pos[0]], y=[pos[1]],
-            mode='markers+text',
-            marker=dict(size=30, color='purple'),
-            text=label,
-            textposition='middle center',
-            textfont=dict(size=10, color='white', family='Arial Black'),
-            showlegend=False,
-            row=1, col=3
-        ))
+        circle = Circle(pos, 0.15, color='purple', zorder=3)
+        ax.add_patch(circle)
+        ax.text(pos[0], pos[1], label, ha='center', va='center',
+                fontsize=10, fontweight='bold', color='white', zorder=4)
     
     edges_kstar = [
         (kstar_vertices[0][0], kstar_vertices[2][0]),
         (kstar_vertices[1][0], kstar_vertices[2][0])
     ]
     for start, end in edges_kstar:
-        fig.add_trace(go.Scatter(
-            x=[start[0], end[0]],
-            y=[start[1], end[1]],
-            mode='lines',
-            line=dict(color='purple', width=2, dash='dash'),
-            showlegend=False,
-            row=1, col=3
-        ))
+        ax.plot([start[0], end[0]], [start[1], end[1]],
+                'purple', linewidth=2, linestyle='--', zorder=1)
     
-    # Update layout
-    for i in range(1, 4):
-        fig.update_xaxes(range=[-0.3, 2.3], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
-        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
-                         showticklabels=False, row=1, col=i)
+    ax.set_xlim(-0.3, 2.3)
+    ax.set_ylim(-0.5, 1.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('Conjugate Complex $K^*$\nVertices=Tokens, Simplices=Atom Clusters',
+                 fontsize=11, fontweight='bold')
     
-    fig.update_layout(
-        title=dict(
-            text='Conjugate Complex Construction: Hypergraph Vertex-Simplex Reversal',
-            x=0.5,
-            font=dict(size=14, family='Arial')
-        ),
-        plot_bgcolor='white',
-        width=1500,
-        height=500,
-        margin=dict(l=20, r=20, t=80, b=20)
-    )
-    
-    fig.write_image('images/figure6_conjugate_transformation.png', width=1500, height=500, scale=2)
+    plt.suptitle('Conjugate Complex Construction: Hypergraph Vertex-Simplex Reversal',
+                 fontsize=14, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig('images/figure6_conjugate_transformation.png', 
+                bbox_inches='tight', facecolor='white')
+    plt.close()
     print("✓ Generated Figure 6: Conjugate Transformation")
 
 # ==================== Main Function ====================
@@ -776,15 +544,6 @@ def main():
     """Generate all figures"""
     print("Starting to generate Simplicial Complex Category figures...")
     print("=" * 60)
-    
-    # Check for kaleido
-    try:
-        import kaleido
-    except ImportError:
-        print("ERROR: kaleido is required for PNG export!")
-        print("Please install: pip install kaleido")
-        print("Or: conda install -c conda-forge python-kaleido")
-        return
     
     try:
         figure1_simplicial_complex()
@@ -801,9 +560,6 @@ def main():
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
-        print("\nIf you see 'kaleido' related errors, please install:")
-        print("  pip install kaleido")
-        print("Or: conda install -c conda-forge python-kaleido")
 
 if __name__ == '__main__':
     main()

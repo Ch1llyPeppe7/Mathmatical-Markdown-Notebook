@@ -3,8 +3,7 @@
 ## Required Packages
 
 The figure generation script requires:
-- `plotly` - for visualization
-- `kaleido` - for PNG export (required by plotly)
+- `matplotlib` - for visualization and PNG export
 - `numpy` - for calculations
 
 ## Installation
@@ -13,14 +12,14 @@ The figure generation script requires:
 
 ```bash
 conda activate Pytorch
-pip install plotly kaleido numpy
+pip install matplotlib numpy
 ```
 
 Or using conda:
 
 ```bash
 conda activate Pytorch
-conda install -c conda-forge plotly python-kaleido numpy
+conda install matplotlib numpy
 ```
 
 ## Run Script
@@ -36,5 +35,5 @@ python generate_figures.py
 ## Notes
 
 - All text in figures is in English to avoid font issues
-- Figures are generated as high-resolution PNG (scale=2)
-- All figures use plotly for better visual quality
+- Figures are generated as high-resolution PNG (300 DPI)
+- All figures use matplotlib for direct PNG export (no external dependencies needed)
