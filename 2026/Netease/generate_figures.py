@@ -1,372 +1,562 @@
 """
-复形范畴笔记插图生成脚本
-使用matplotlib和networkx生成静态PNG图片
+Simplicial Complex Category Notes - Figure Generation Script
+Using plotly for better visualization
+Requires: plotly, kaleido (for PNG export)
+Install: pip install plotly kaleido
 """
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.patches import Polygon, FancyBboxPatch, FancyArrowPatch
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 import numpy as np
 import os
 
-# 创建images目录
+# Check for kaleido
+try:
+    import kaleido
+except ImportError:
+    print("Warning: kaleido not found. Installing...")
+    print("Please run: pip install kaleido")
+    print("Or: conda install -c conda-forge python-kaleido")
+
+# Create images directory
 os.makedirs('images', exist_ok=True)
 
-# 设置中文字体（如果需要）
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
-plt.rcParams['axes.unicode_minus'] = False
-
-# ==================== 插图1：单纯复形（Hypergraph）示例 ====================
+# ==================== Figure 1: Simplicial Complex (Hypergraph) ====================
 
 def figure1_simplicial_complex():
-    """生成包含0-3维单纯形的复形可视化"""
-    fig, ax = plt.subplots(figsize=(10, 8))
+    """Generate simplicial complex visualization as hypergraph"""
+    fig = go.Figure()
     
-    # 定义顶点坐标
-    v0 = np.array([0, 0])
-    v1 = np.array([2, 0])
-    v2 = np.array([1, 1.732])
-    v3 = np.array([1, 0.577])
-    
-    vertices = [v0, v1, v2, v3]
+    # Define vertices (0-simplices)
+    vertices = np.array([
+        [0, 0],      # a
+        [2, 0],      # b
+        [1, 1.732],  # c
+        [1, 0.577]   # d
+    ])
     labels = ['a', 'b', 'c', 'd']
     
-    # 绘制3维单纯形（四面体）- 用半透明填充
-    tetrahedron = [
-        [v0, v1, v2],
-        [v0, v1, v3],
-        [v0, v2, v3],
-        [v1, v2, v3]
+    # Draw 3-simplex (tetrahedron) faces with transparency
+    tetra_faces = [
+        [0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]
     ]
-    for face in tetrahedron:
-        triangle = Polygon(face, alpha=0.15, color='blue', edgecolor='none')
-        ax.add_patch(triangle)
+    for face in tetra_faces:
+        x_coords = [vertices[i][0] for i in face] + [vertices[face[0]][0]]
+        y_coords = [vertices[i][1] for i in face] + [vertices[face[0]][1]]
+        fig.add_trace(go.Scatter(
+            x=x_coords, y=y_coords,
+            fill='toself',
+            fillcolor='rgba(100, 150, 255, 0.1)',
+            line=dict(color='rgba(100, 150, 255, 0.3)', width=1),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
     
-    # 绘制2维单纯形（三角形）- 用较深颜色填充
+    # Draw 2-simplex (triangles) - more visible
     triangles = [
-        [v0, v1, v2],
-        [v0, v1, v3]
+        [0, 1, 2], [0, 1, 3]
     ]
     for tri in triangles:
-        triangle = Polygon(tri, alpha=0.3, color='blue', edgecolor='blue', linewidth=1.5)
-        ax.add_patch(triangle)
+        x_coords = [vertices[i][0] for i in tri] + [vertices[tri[0]][0]]
+        y_coords = [vertices[i][1] for i in tri] + [vertices[tri[0]][1]]
+        fig.add_trace(go.Scatter(
+            x=x_coords, y=y_coords,
+            fill='toself',
+            fillcolor='rgba(100, 150, 255, 0.3)',
+            line=dict(color='rgba(50, 100, 200, 0.8)', width=2),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
     
-    # 绘制1维单纯形（边）
+    # Draw 1-simplex (edges)
     edges = [
-        (v0, v1), (v1, v2), (v2, v0),
-        (v0, v3), (v1, v3), (v2, v3)
+        (0, 1), (1, 2), (2, 0),
+        (0, 3), (1, 3), (2, 3)
     ]
-    for v_start, v_end in edges:
-        ax.plot([v_start[0], v_end[0]], [v_start[1], v_end[1]], 
-                'k-', linewidth=2, zorder=2)
+    for i, j in edges:
+        fig.add_trace(go.Scatter(
+            x=[vertices[i][0], vertices[j][0]],
+            y=[vertices[i][1], vertices[j][1]],
+            mode='lines',
+            line=dict(color='black', width=2),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
     
-    # 绘制0维单纯形（顶点）
-    for i, (v, label) in enumerate(zip(vertices, labels)):
-        ax.scatter(v[0], v[1], s=200, c='black', zorder=5)
-        ax.text(v[0], v[1] - 0.2, label, fontsize=14, ha='center', weight='bold')
+    # Draw 0-simplex (vertices)
+    fig.add_trace(go.Scatter(
+        x=vertices[:, 0],
+        y=vertices[:, 1],
+        mode='markers+text',
+        marker=dict(size=20, color='black'),
+        text=labels,
+        textposition='bottom center',
+        textfont=dict(size=14, color='black', family='Arial Black'),
+        showlegend=False,
+        hoverinfo='text',
+        hovertext=[f'Vertex {l}' for l in labels]
+    ))
     
-    # 添加维度标注
-    ax.text(0.5, 0.3, '0维: 顶点', fontsize=10, style='italic', color='gray')
-    ax.text(0.5, 0.5, '1维: 边', fontsize=10, style='italic', color='gray')
-    ax.text(0.5, 0.7, '2维: 三角形', fontsize=10, style='italic', color='gray')
-    ax.text(0.5, 0.9, '3维: 四面体', fontsize=10, style='italic', color='gray')
+    # Add dimension labels
+    fig.add_annotation(x=0.5, y=0.3, text="0-dim: vertices", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    fig.add_annotation(x=0.5, y=0.5, text="1-dim: edges", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    fig.add_annotation(x=0.5, y=0.7, text="2-dim: triangles", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    fig.add_annotation(x=0.5, y=0.9, text="3-dim: tetrahedron", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
     
-    ax.set_xlim(-0.5, 2.5)
-    ax.set_ylim(-0.5, 2.5)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.set_title('单纯复形（Simplicial Complex）\n作为超图（Hypergraph）的可视化', 
-                 fontsize=14, pad=20)
-    plt.tight_layout()
-    plt.savefig('images/figure1_simplicial_complex.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图1: 单纯复形可视化")
+    fig.update_layout(
+        title=dict(
+            text='Simplicial Complex (Hypergraph Visualization)',
+            x=0.5,
+            font=dict(size=16, family='Arial')
+        ),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        plot_bgcolor='white',
+        width=800,
+        height=700,
+        margin=dict(l=20, r=20, t=60, b=20)
+    )
+    
+    fig.write_image('images/figure1_simplicial_complex.png', width=800, height=700, scale=2)
+    print("✓ Generated Figure 1: Simplicial Complex")
 
-# ==================== 插图2：BPE的推出构造过程 ====================
+# ==================== Figure 2: BPE Pushout Process (Hypergraph Iteration) ====================
 
 def figure2_bpe_pushout():
-    """生成BPE的推出构造过程（序列图）"""
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    """Generate BPE pushout process: showing hypergraph step-by-step aggregation"""
+    fig = make_subplots(
+        rows=1, cols=4,
+        subplot_titles=('Step 1: Atoms<br>(0-simplices)', 
+                       'Step 2: Add Edges<br>(1-simplices)',
+                       'Step 3: Pushout<br>(Merge to Tokens)',
+                       'Step 4: Higher Dim<br>(2-simplices)'),
+        horizontal_spacing=0.1
+    )
     
-    # 阶段1：初始状态（原子复形）
-    ax1 = axes[0]
-    # 绘制原子顶点
-    atoms = ['a', 'b', 'c']
-    positions = [(0, 0), (1, 0), (2, 0)]
-    for pos, atom in zip(positions, atoms):
-        circle = plt.Circle(pos, 0.15, color='blue', zorder=3)
-        ax1.add_patch(circle)
-        ax1.text(pos[0], pos[1], atom, ha='center', va='center', 
-                fontsize=12, weight='bold', color='white', zorder=4)
-    ax1.set_xlim(-0.5, 2.5)
-    ax1.set_ylim(-0.5, 0.5)
-    ax1.set_aspect('equal')
-    ax1.axis('off')
-    ax1.set_title('阶段1: 原子复形\n（0维单纯形）', fontsize=11, pad=10)
+    atoms = ['a', 'b', 'c', 'd']
+    positions = np.array([[0, 0], [1, 0], [2, 0], [3, 0]])
     
-    # 阶段2：中间状态（推出构造）
-    ax2 = axes[1]
-    # 绘制原子
-    for pos, atom in zip(positions, atoms):
-        circle = plt.Circle(pos, 0.15, color='blue', zorder=3)
-        ax2.add_patch(circle)
-        ax2.text(pos[0], pos[1], atom, ha='center', va='center', 
-                fontsize=12, weight='bold', color='white', zorder=4)
-    # 绘制边（1维单纯形）
-    ax2.plot([0, 1], [0, 0], 'g-', linewidth=3, zorder=2, label='合并')
-    ax2.plot([1, 2], [0, 0], 'g-', linewidth=3, zorder=2)
-    # 添加箭头表示推出
-    arrow = FancyArrowPatch((0.5, 0.2), (1.5, 0.2), 
-                           arrowstyle='->', mutation_scale=20, 
-                           color='red', linewidth=2, zorder=5)
-    ax2.add_patch(arrow)
-    ax2.text(1, 0.35, '推出构造', ha='center', fontsize=10, 
-            color='red', weight='bold')
-    ax2.set_xlim(-0.5, 2.5)
-    ax2.set_ylim(-0.5, 0.8)
-    ax2.set_aspect('equal')
-    ax2.axis('off')
-    ax2.set_title('阶段2: 推出构造\n（聚合过程）', fontsize=11, pad=10)
+    # Step 1: Atoms only
+    for i, (pos, atom) in enumerate(zip(positions, atoms)):
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=30, color='blue'),
+            text=atom,
+            textposition='middle center',
+            textfont=dict(size=12, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=1
+        ))
     
-    # 阶段3：最终状态（高维Token）
-    ax3 = axes[2]
-    # 绘制Token（高维单纯形）
-    token_positions = [(0.5, 0), (1.5, 0)]
-    token_labels = ['ab', 'bc']
+    # Step 2: Add edges
+    for i, (pos, atom) in enumerate(zip(positions, atoms)):
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=30, color='blue'),
+            text=atom,
+            textposition='middle center',
+            textfont=dict(size=12, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=2
+        ))
+    # Draw edges
+    for i in range(len(positions) - 1):
+        fig.add_trace(go.Scatter(
+            x=[positions[i][0], positions[i+1][0]],
+            y=[positions[i][1], positions[i+1][1]],
+            mode='lines',
+            line=dict(color='green', width=4),
+            showlegend=False,
+            row=1, col=2
+        ))
+    
+    # Step 3: Merge to tokens
+    token_positions = np.array([[0.5, 0], [1.5, 0], [2.5, 0]])
+    token_labels = ['ab', 'bc', 'cd']
     for pos, label in zip(token_positions, token_labels):
-        # 绘制更大的圆表示Token
-        circle = plt.Circle(pos, 0.25, color='purple', zorder=3)
-        ax3.add_patch(circle)
-        ax3.text(pos[0], pos[1], label, ha='center', va='center', 
-                fontsize=12, weight='bold', color='white', zorder=4)
-    # 绘制连接
-    ax3.plot([0.5, 1.5], [0, 0], 'purple', linewidth=2, zorder=2)
-    ax3.set_xlim(-0.5, 2.5)
-    ax3.set_ylim(-0.5, 0.5)
-    ax3.set_aspect('equal')
-    ax3.axis('off')
-    ax3.set_title('阶段3: 高维Token复形\n（1-3维单纯形）', fontsize=11, pad=10)
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=50, color='purple', symbol='ellipse', 
+                        line=dict(width=2, color='purple')),
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=12, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=3
+        ))
+    # Show original atoms (faded)
+    for pos, atom in zip(positions, atoms):
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers',
+            marker=dict(size=20, color='blue', opacity=0.3),
+            showlegend=False,
+            row=1, col=3
+        ))
     
-    plt.suptitle('BPE的余极限过程：从原子复形到Token复形', 
-                fontsize=14, weight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig('images/figure2_bpe_pushout.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图2: BPE的推出构造过程")
+    # Step 4: Higher dimension aggregation
+    big_token_pos = np.array([1.5, 0])
+    # Draw triangle (2-simplex)
+    triangle_vertices = np.array([[0.5, -0.3], [2.5, -0.3], [1.5, 0.3]])
+    fig.add_trace(go.Scatter(
+        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
+        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
+        fill='toself',
+        fillcolor='rgba(255, 165, 0, 0.5)',
+        line=dict(color='orange', width=2),
+        showlegend=False,
+        row=1, col=4
+    ))
+    fig.add_trace(go.Scatter(
+        x=[big_token_pos[0]], y=[big_token_pos[1]],
+        mode='markers+text',
+        marker=dict(size=40, color='orange'),
+        text='abc',
+        textposition='middle center',
+        textfont=dict(size=12, color='white', family='Arial Black'),
+        showlegend=False,
+        row=1, col=4
+    ))
+    
+    # Update layout
+    for i in range(1, 5):
+        fig.update_xaxes(range=[-0.5, 3.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+        fig.update_yaxes(range=[-0.5, 0.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+    
+    fig.update_layout(
+        title=dict(
+            text='BPE Colimit Process: Hypergraph Step-by-Step Aggregation',
+            x=0.5,
+            font=dict(size=14, family='Arial')
+        ),
+        plot_bgcolor='white',
+        width=1600,
+        height=400,
+        margin=dict(l=20, r=20, t=80, b=20)
+    )
+    
+    fig.write_image('images/figure2_bpe_pushout.png', width=1600, height=400, scale=2)
+    print("✓ Generated Figure 2: BPE Pushout Process")
 
-# ==================== 插图3：逆向分裂的拉回构造过程 ====================
+# ==================== Figure 3: Inverse Splitting Pullback Process ====================
 
 def figure3_inverse_splitting_pullback():
-    """生成逆向分裂的拉回构造过程"""
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    """Generate inverse splitting pullback process: showing hypergraph step-by-step decomposition"""
+    fig = make_subplots(
+        rows=1, cols=4,
+        subplot_titles=('Step 1: Global Complex<br>(2-simplex)', 
+                       'Step 2: Decompose to Edges<br>(1-simplices)',
+                       'Step 3: Pullback<br>(Filter Clusters)',
+                       'Step 4: Minimal Clusters<br>(Limit Object)'),
+        horizontal_spacing=0.1
+    )
     
-    # 阶段1：初始状态（全局交互复形）
-    ax1 = axes[0]
-    # 绘制有向加权复形
-    nodes = {'A': (0, 0), 'B': (1.5, 0), 'C': (0.75, 1.3)}
-    for node, pos in nodes.items():
-        circle = plt.Circle(pos, 0.2, color='orange', zorder=3)
-        ax1.add_patch(circle)
-        ax1.text(pos[0], pos[1], node, ha='center', va='center', 
-                fontsize=12, weight='bold', color='white', zorder=4)
-    # 绘制有向边（带权重）
+    # Step 1: 2-simplex (triangle)
+    triangle_vertices = np.array([[0.5, 0], [2, 0], [1.25, 1.2]])
+    labels = ['A', 'B', 'C']
+    
+    fig.add_trace(go.Scatter(
+        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
+        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
+        fill='toself',
+        fillcolor='rgba(255, 165, 0, 0.4)',
+        line=dict(color='orange', width=2),
+        showlegend=False,
+        row=1, col=1
+    ))
+    for i, (v, label) in enumerate(zip(triangle_vertices, labels)):
+        fig.add_trace(go.Scatter(
+            x=[v[0]], y=[v[1]],
+            mode='markers+text',
+            marker=dict(size=30, color='orange'),
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=12, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=1
+        ))
+    
+    # Step 2: Decompose to edges
     edges = [
-        (('A', 'B'), 0.8), (('B', 'C'), 0.6), (('C', 'A'), 0.4)
+        (triangle_vertices[0], triangle_vertices[1], 'AB'),
+        (triangle_vertices[1], triangle_vertices[2], 'BC'),
+        (triangle_vertices[2], triangle_vertices[0], 'CA')
     ]
-    for (start, end), weight in edges:
-        start_pos = nodes[start]
-        end_pos = nodes[end]
-        # 绘制箭头
-        dx = end_pos[0] - start_pos[0]
-        dy = end_pos[1] - start_pos[1]
-        ax1.arrow(start_pos[0] + 0.15*dx, start_pos[1] + 0.15*dy,
-                 dx*0.7, dy*0.7, head_width=0.1, head_length=0.1,
-                 fc='red', ec='red', linewidth=2, zorder=2)
-        # 标注权重
-        mid_x, mid_y = (start_pos[0] + end_pos[0])/2, (start_pos[1] + end_pos[1])/2
-        ax1.text(mid_x + 0.1, mid_y + 0.1, f'w={weight}', 
-                fontsize=9, color='red', weight='bold')
-    ax1.set_xlim(-0.5, 2.5)
-    ax1.set_ylim(-0.5, 2)
-    ax1.set_aspect('equal')
-    ax1.axis('off')
-    ax1.set_title('阶段1: 全局交互复形\n（有向加权）', fontsize=11, pad=10)
+    for start, end, label in edges:
+        fig.add_trace(go.Scatter(
+            x=[start[0], end[0]],
+            y=[start[1], end[1]],
+            mode='lines+text',
+            line=dict(color='green', width=3),
+            text=[None, label],
+            textposition='top center',
+            textfont=dict(size=10, color='green', family='Arial'),
+            showlegend=False,
+            row=1, col=2
+        ))
+    for v, label in zip(triangle_vertices, labels):
+        fig.add_trace(go.Scatter(
+            x=[v[0]], y=[v[1]],
+            mode='markers+text',
+            marker=dict(size=25, color='orange', opacity=0.6),
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=11, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=2
+        ))
     
-    # 阶段2：中间状态（拉回构造）
-    ax2 = axes[1]
-    # 绘制分解过程
-    for node, pos in nodes.items():
-        circle = plt.Circle(pos, 0.2, color='orange', alpha=0.5, zorder=3)
-        ax2.add_patch(circle)
-        ax2.text(pos[0], pos[1], node, ha='center', va='center', 
-                fontsize=12, weight='bold', color='gray', zorder=4)
-    # 绘制分解箭头
-    ax2.arrow(0.75, 0.65, 0, -0.3, head_width=0.15, head_length=0.1,
-             fc='blue', ec='blue', linewidth=2, zorder=5)
-    ax2.text(0.9, 0.5, '拉回构造', ha='left', fontsize=10, 
-            color='blue', weight='bold')
-    # 绘制分解后的原子簇
-    cluster_positions = [(0.2, -0.5), (1.3, -0.5)]
-    cluster_labels = ['{A,B}', '{B,C}']
-    for pos, label in zip(cluster_positions, cluster_labels):
-        rect = FancyBboxPatch((pos[0]-0.3, pos[1]-0.2), 0.6, 0.4,
-                             boxstyle="round,pad=0.1", 
-                             facecolor='lightgreen', edgecolor='green',
-                             linewidth=2, zorder=3)
-        ax2.add_patch(rect)
-        ax2.text(pos[0], pos[1], label, ha='center', va='center', 
-                fontsize=10, weight='bold', zorder=4)
-    ax2.set_xlim(-0.5, 2.5)
-    ax2.set_ylim(-1, 2)
-    ax2.set_aspect('equal')
-    ax2.axis('off')
-    ax2.set_title('阶段2: 拉回构造\n（分解过程）', fontsize=11, pad=10)
+    # Step 3: Pullback (filter clusters)
+    clusters = [
+        (np.array([0.5, 0.3]), '{A,B}'),
+        (np.array([1.25, 0.6]), '{B,C}')
+    ]
+    for pos, label in clusters:
+        # Draw rectangle for cluster
+        rect_x = [pos[0]-0.3, pos[0]+0.3, pos[0]+0.3, pos[0]-0.3, pos[0]-0.3]
+        rect_y = [pos[1]-0.15, pos[1]-0.15, pos[1]+0.15, pos[1]+0.15, pos[1]-0.15]
+        fig.add_trace(go.Scatter(
+            x=rect_x, y=rect_y,
+            fill='toself',
+            fillcolor='rgba(144, 238, 144, 0.6)',
+            line=dict(color='green', width=2),
+            showlegend=False,
+            row=1, col=3
+        ))
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='text',
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=10, color='black', family='Arial Black'),
+            showlegend=False,
+            row=1, col=3
+        ))
     
-    # 阶段3：最终状态（极小原子簇）
-    ax3 = axes[2]
-    # 绘制极小原子簇
+    # Step 4: Minimal clusters
     final_clusters = [
-        ((0.5, 0), '{A,B}'),
-        ((1.5, 0), '{B,C}'),
-        ((1, 0.8), '{A}')
+        (np.array([0.5, 0.2]), '{A,B}'),
+        (np.array([1.25, 0.4]), '{B,C}'),
+        (np.array([0.875, 0.8]), '{A}')
     ]
     for pos, label in final_clusters:
-        rect = FancyBboxPatch((pos[0]-0.25, pos[1]-0.15), 0.5, 0.3,
-                             boxstyle="round,pad=0.05", 
-                             facecolor='lightblue', edgecolor='blue',
-                             linewidth=2, zorder=3)
-        ax3.add_patch(rect)
-        ax3.text(pos[0], pos[1], label, ha='center', va='center', 
-                fontsize=10, weight='bold', zorder=4)
-    ax3.set_xlim(-0.5, 2.5)
-    ax3.set_ylim(-0.5, 1.5)
-    ax3.set_aspect('equal')
-    ax3.axis('off')
-    ax3.set_title('阶段3: 极小原子簇\n（极限对象）', fontsize=11, pad=10)
+        rect_x = [pos[0]-0.25, pos[0]+0.25, pos[0]+0.25, pos[0]-0.25, pos[0]-0.25]
+        rect_y = [pos[1]-0.12, pos[1]-0.12, pos[1]+0.12, pos[1]+0.12, pos[1]-0.12]
+        fig.add_trace(go.Scatter(
+            x=rect_x, y=rect_y,
+            fill='toself',
+            fillcolor='rgba(173, 216, 230, 0.7)',
+            line=dict(color='blue', width=2),
+            showlegend=False,
+            row=1, col=4
+        ))
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='text',
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=9, color='black', family='Arial Black'),
+            showlegend=False,
+            row=1, col=4
+        ))
     
-    plt.suptitle('逆向分裂的极限过程：从全局交互复形到极小原子簇', 
-                fontsize=14, weight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig('images/figure3_inverse_splitting_pullback.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图3: 逆向分裂的拉回构造过程")
+    # Update layout
+    for i in range(1, 5):
+        fig.update_xaxes(range=[-0.5, 2.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+    
+    fig.update_layout(
+        title=dict(
+            text='Inverse Splitting Limit Process: Hypergraph Step-by-Step Decomposition',
+            x=0.5,
+            font=dict(size=14, family='Arial')
+        ),
+        plot_bgcolor='white',
+        width=1600,
+        height=400,
+        margin=dict(l=20, r=20, t=80, b=20)
+    )
+    
+    fig.write_image('images/figure3_inverse_splitting_pullback.png', width=1600, height=400, scale=2)
+    print("✓ Generated Figure 3: Inverse Splitting Pullback Process")
 
-# ==================== 插图4：共轭复形的构造 ====================
+# ==================== Figure 4: Conjugate Complex Construction ====================
 
 def figure4_conjugate_complex():
-    """生成共轭复形的构造可视化"""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    """Generate conjugate complex construction visualization"""
+    fig = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=('Original Complex $K$<br>Vertices=Atoms, Simplices=Tokens',
+                       'Conjugate Complex $K^*$<br>Vertices=Tokens, Simplices=Atom Clusters'),
+        horizontal_spacing=0.15
+    )
     
-    # 左图：原复形 K
-    # 绘制原复形（简单的三角形）
-    vertices_k = np.array([[0, 0], [2, 0], [1, 1.732]])
-    triangle_k = Polygon(vertices_k, alpha=0.3, color='blue', 
-                        edgecolor='blue', linewidth=2)
-    ax1.add_patch(triangle_k)
+    # Left: Original complex K
+    vertices_k = np.array([[0.5, 0], [1.5, 0], [1, 0.866]])
+    labels_k = ['a', 'b', 'c']
     
-    # 绘制边
+    # Draw triangle
+    fig.add_trace(go.Scatter(
+        x=list(vertices_k[:, 0]) + [vertices_k[0, 0]],
+        y=list(vertices_k[:, 1]) + [vertices_k[0, 1]],
+        fill='toself',
+        fillcolor='rgba(100, 150, 255, 0.3)',
+        line=dict(color='blue', width=2),
+        showlegend=False,
+        row=1, col=1
+    ))
+    # Draw edges
     for i in range(3):
-        ax1.plot([vertices_k[i, 0], vertices_k[(i+1)%3, 0]], 
-                [vertices_k[i, 1], vertices_k[(i+1)%3, 1]], 
-                'b-', linewidth=2)
+        fig.add_trace(go.Scatter(
+            x=[vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
+            y=[vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
+            mode='lines',
+            line=dict(color='blue', width=2),
+            showlegend=False,
+            row=1, col=1
+        ))
+    # Draw vertices
+    for v, label in zip(vertices_k, labels_k):
+        fig.add_trace(go.Scatter(
+            x=[v[0]], y=[v[1]],
+            mode='markers+text',
+            marker=dict(size=25, color='blue'),
+            text=label,
+            textposition='bottom center',
+            textfont=dict(size=11, color='blue', family='Arial Black'),
+            showlegend=False,
+            row=1, col=1
+        ))
+    fig.add_annotation(x=1, y=0.5, text="{a,b,c}", 
+                      showarrow=False, font=dict(size=10, color='blue', style='italic'),
+                      row=1, col=1)
     
-    # 绘制顶点并标注
-    labels_k = ['{a}', '{b}', '{c}']
-    for i, (v, label) in enumerate(zip(vertices_k, labels_k)):
-        ax1.scatter(v[0], v[1], s=200, c='blue', zorder=5)
-        ax1.text(v[0], v[1] - 0.3, label, ha='center', fontsize=11, weight='bold')
-    
-    # 标注单纯形
-    ax1.text(1, 0.6, '{a,b,c}', fontsize=10, ha='center', 
-            style='italic', color='blue', weight='bold')
-    ax1.text(1, -0.5, '{a,b}', fontsize=9, ha='center', style='italic', color='blue')
-    ax1.text(0.3, 0.3, '{a,c}', fontsize=9, ha='center', style='italic', color='blue')
-    ax1.text(1.7, 0.3, '{b,c}', fontsize=9, ha='center', style='italic', color='blue')
-    
-    ax1.set_xlim(-0.5, 2.5)
-    ax1.set_ylim(-0.8, 2.2)
-    ax1.set_aspect('equal')
-    ax1.axis('off')
-    ax1.set_title('原复形 $K$\n顶点=原子，单纯形=Token', fontsize=12, pad=15)
-    
-    # 右图：共轭复形 K*
-    # 绘制共轭复形的顶点（原复形的单纯形）
-    vertices_kstar = [
-        ((0.5, 0), '{a,b}'),
-        ((1.5, 0), '{b,c}'),
-        ((0.5, 1.2), '{a,c}'),
-        ((1, 0.6), '{a,b,c}')
+    # Right: Conjugate complex K*
+    kstar_vertices = [
+        (np.array([0.5, 0.2]), '{a,b}'),
+        (np.array([1.5, 0.2]), '{b,c}'),
+        (np.array([1, 0.866]), '{a,b,c}')
     ]
     
-    for pos, label in vertices_kstar:
-        circle = plt.Circle(pos, 0.25, color='purple', zorder=3)
-        ax2.add_patch(circle)
-        ax2.text(pos[0], pos[1], label, ha='center', va='center', 
-                fontsize=10, weight='bold', color='white', zorder=4)
+    for pos, label in kstar_vertices:
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=30, color='purple'),
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=10, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=2
+        ))
     
-    # 绘制共轭复形的边（表示闭覆盖关系）
+    # Draw edges in K*
     edges_kstar = [
-        ((0.5, 0), (1, 0.6)),
-        ((1.5, 0), (1, 0.6)),
-        ((0.5, 1.2), (1, 0.6))
+        (kstar_vertices[0][0], kstar_vertices[2][0]),
+        (kstar_vertices[1][0], kstar_vertices[2][0])
     ]
-    for (start, end) in edges_kstar:
-        ax2.plot([start[0], end[0]], [start[1], end[1]], 
-                'purple', linewidth=2, zorder=2, alpha=0.6)
+    for start, end in edges_kstar:
+        fig.add_trace(go.Scatter(
+            x=[start[0], end[0]],
+            y=[start[1], end[1]],
+            mode='lines',
+            line=dict(color='purple', width=2, dash='dash'),
+            showlegend=False,
+            row=1, col=2
+        ))
     
-    # 添加箭头表示转换
-    arrow = FancyArrowPatch((2.7, 1), (3.3, 1), 
-                           arrowstyle='<->', mutation_scale=25, 
-                           color='red', linewidth=3, zorder=10)
-    ax2.add_patch(arrow)
-    ax2.text(3, 1.3, '顶点-单纯形\n反转', ha='center', fontsize=10, 
-            color='red', weight='bold')
+    fig.add_annotation(x=1, y=0.5, text="Atom Clusters", 
+                      showarrow=False, font=dict(size=10, color='purple', style='italic'),
+                      row=1, col=2)
     
-    ax2.set_xlim(-0.5, 4)
-    ax2.set_ylim(-0.5, 1.8)
-    ax2.set_aspect('equal')
-    ax2.axis('off')
-    ax2.set_title('共轭复形 $K^*$\n顶点=Token，单纯形=原子簇', fontsize=12, pad=15)
+    # Add transformation arrow
+    fig.add_annotation(
+        x=1.5, y=0.5,
+        text="Vertex↔Simplex<br>Reversal",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1.5,
+        arrowwidth=3,
+        arrowcolor='red',
+        ax=0, ay=0,
+        font=dict(size=11, color='red', family='Arial Black'),
+        bgcolor='rgba(255, 255, 255, 0.8)',
+        bordercolor='red',
+        borderwidth=2
+    )
     
-    plt.suptitle('共轭复形的构造：顶点-单纯形反转', 
-                fontsize=14, weight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig('images/figure4_conjugate_complex.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图4: 共轭复形的构造")
+    # Update layout
+    for i in range(1, 3):
+        fig.update_xaxes(range=[-0.3, 2.3], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+    
+    fig.update_layout(
+        title=dict(
+            text='Conjugate Complex Construction: Vertex-Simplex Reversal',
+            x=0.5,
+            font=dict(size=14, family='Arial')
+        ),
+        plot_bgcolor='white',
+        width=1200,
+        height=500,
+        margin=dict(l=20, r=20, t=80, b=20)
+    )
+    
+    fig.write_image('images/figure4_conjugate_complex.png', width=1200, height=500, scale=2)
+    print("✓ Generated Figure 4: Conjugate Complex Construction")
 
-# ==================== 插图5：有向加权复形 ====================
+# ==================== Figure 5: Weighted Directed Complex ====================
 
 def figure5_weighted_directed_complex():
-    """生成有向加权复形的可视化"""
-    fig, ax = plt.subplots(figsize=(10, 8))
+    """Generate weighted directed complex visualization"""
+    fig = go.Figure()
     
-    # 定义节点位置（物品）
+    # Define node positions (items)
     nodes = {
-        '1': (0, 0),
-        '2': (2, 0),
-        '3': (1, 1.732),
-        '4': (3, 1.732)
+        '1': np.array([0, 0]),
+        '2': np.array([2, 0]),
+        '3': np.array([1, 1.732]),
+        '4': np.array([3, 1.732])
     }
     
-    # 绘制节点
-    for node, pos in nodes.items():
-        circle = plt.Circle(pos, 0.3, color='orange', zorder=3)
-        ax.add_patch(circle)
-        ax.text(pos[0], pos[1], f'物品{node}', ha='center', va='center', 
-                fontsize=11, weight='bold', color='white', zorder=4)
+    # Draw nodes
+    for node_id, pos in nodes.items():
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=40, color='orange', line=dict(width=2, color='darkorange')),
+            text=f'Item {node_id}',
+            textposition='middle center',
+            textfont=dict(size=11, color='white', family='Arial Black'),
+            showlegend=False,
+            name=node_id
+        ))
     
-    # 定义有向边和权重
+    # Define directed edges with weights
     edges = [
-        (('1', '2'), 0.8, 'black'),
-        (('2', '3'), 0.6, 'black'),
-        (('3', '1'), 0.4, 'black'),
-        (('2', '4'), 0.7, 'black'),
-        (('4', '3'), 0.5, 'black')
+        (('1', '2'), 0.8),
+        (('2', '3'), 0.6),
+        (('3', '1'), 0.4),
+        (('2', '4'), 0.7),
+        (('4', '3'), 0.5)
     ]
     
-    # 绘制有向边
-    for (start, end), weight, color in edges:
+    # Draw directed edges with arrows using annotations
+    for (start, end), weight in edges:
         start_pos = nodes[start]
         end_pos = nodes[end]
         dx = end_pos[0] - start_pos[0]
@@ -375,161 +565,245 @@ def figure5_weighted_directed_complex():
         dx_norm = dx / length
         dy_norm = dy / length
         
-        # 绘制箭头
-        ax.arrow(start_pos[0] + 0.3*dx_norm, start_pos[1] + 0.3*dy_norm,
-                dx*0.4, dy*0.4, head_width=0.15, head_length=0.15,
-                fc=color, ec=color, linewidth=2.5, zorder=2)
+        # Calculate arrow start and end (avoiding node overlap)
+        arrow_start_x = start_pos[0] + 0.3 * dx_norm
+        arrow_start_y = start_pos[1] + 0.3 * dy_norm
+        arrow_end_x = end_pos[0] - 0.3 * dx_norm
+        arrow_end_y = end_pos[1] - 0.3 * dy_norm
         
-        # 标注权重
-        mid_x = start_pos[0] + 0.5*dx
-        mid_y = start_pos[1] + 0.5*dy
-        # 偏移标注位置避免重叠
-        offset_x = -0.15*dy_norm
-        offset_y = 0.15*dx_norm
-        ax.text(mid_x + offset_x, mid_y + offset_y, f'w={weight}', 
-               fontsize=9, color='red', weight='bold',
-               bbox=dict(boxstyle='round,pad=0.3', facecolor='white', 
-                        edgecolor='red', alpha=0.8), zorder=5)
+        # Add arrow annotation (plotly handles arrow drawing)
+        fig.add_annotation(
+            x=arrow_end_x,
+            y=arrow_end_y,
+            ax=arrow_start_x,
+            ay=arrow_start_y,
+            arrowhead=2,
+            arrowsize=1.5,
+            arrowwidth=3,
+            arrowcolor='red',
+            showarrow=True,
+            axref='x',
+            ayref='y',
+            xref='x',
+            yref='y'
+        )
+        
+        # Label weight
+        mid_x = (start_pos[0] + end_pos[0]) / 2
+        mid_y = (start_pos[1] + end_pos[1]) / 2
+        offset_x = -0.15 * dy_norm
+        offset_y = 0.15 * dx_norm
+        fig.add_annotation(
+            x=mid_x + offset_x,
+            y=mid_y + offset_y,
+            text=f'w={weight}',
+            showarrow=False,
+            font=dict(size=10, color='red', family='Arial Black'),
+            bgcolor='rgba(255, 255, 255, 0.9)',
+            bordercolor='red',
+            borderwidth=1,
+            borderpad=3
+        )
     
-    # 绘制2维单纯形（有向三角形）
-    triangle_vertices = [nodes['1'], nodes['2'], nodes['3']]
-    triangle = Polygon(triangle_vertices, alpha=0.2, color='green', 
-                      edgecolor='green', linewidth=2, linestyle='--', zorder=1)
-    ax.add_patch(triangle)
-    ax.text(1, 0.6, '有向三角形\n(2维单纯形)', ha='center', fontsize=9, 
-           style='italic', color='green', weight='bold')
+    # Draw 2-simplex (directed triangle)
+    triangle_vertices = np.array([nodes['1'], nodes['2'], nodes['3']])
+    fig.add_trace(go.Scatter(
+        x=list(triangle_vertices[:, 0]) + [triangle_vertices[0, 0]],
+        y=list(triangle_vertices[:, 1]) + [triangle_vertices[0, 1]],
+        fill='toself',
+        fillcolor='rgba(0, 255, 0, 0.2)',
+        line=dict(color='green', width=2, dash='dash'),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    fig.add_annotation(x=1, y=0.6, text="Directed Triangle<br>(2-simplex)", 
+                      showarrow=False, font=dict(size=9, color='green', style='italic'))
     
-    # 添加说明
-    ax.text(1.5, -0.8, '有向边表示时序关系：物品i → 物品j', 
-           fontsize=10, ha='center', style='italic')
-    ax.text(1.5, -1.1, '权重w表示共现频率（基于AEP收敛）', 
-           fontsize=10, ha='center', style='italic')
+    fig.add_annotation(x=1.5, y=-0.8, text="Directed edges show temporal relations: Item i → Item j", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
+    fig.add_annotation(x=1.5, y=-1.1, text="Weights w represent co-occurrence frequency (AEP convergence)", 
+                      showarrow=False, font=dict(size=10, color='gray', style='italic'))
     
-    ax.set_xlim(-0.5, 3.5)
-    ax.set_ylim(-1.5, 2.5)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.set_title('有向加权复形\n从交互序列构造全局交互复形', 
-                fontsize=14, pad=20, weight='bold')
-    plt.tight_layout()
-    plt.savefig('images/figure5_weighted_directed_complex.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图5: 有向加权复形")
+    fig.update_layout(
+        title=dict(
+            text='Weighted Directed Complex: From Interaction Sequences to Global Complex',
+            x=0.5,
+            font=dict(size=14, family='Arial')
+        ),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 3.5]),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-1.5, 2.5]),
+        plot_bgcolor='white',
+        width=1000,
+        height=800,
+        margin=dict(l=20, r=20, t=80, b=100)
+    )
+    
+    fig.write_image('images/figure5_weighted_directed_complex.png', width=1000, height=800, scale=2)
+    print("✓ Generated Figure 5: Weighted Directed Complex")
 
-# ==================== 插图6：推出和拉回的交换图 ====================
+# ==================== Figure 6: Conjugate Transformation ====================
 
-def figure6_commutative_diagrams():
-    """生成推出和拉回的交换图"""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+def figure6_conjugate_transformation():
+    """Generate conjugate complex hypergraph transformation"""
+    fig = make_subplots(
+        rows=1, cols=3,
+        subplot_titles=('Original Complex $K$<br>Vertices=Atoms, Simplices=Tokens',
+                       'Transformation',
+                       'Conjugate Complex $K^*$<br>Vertices=Tokens, Simplices=Atom Clusters'),
+        horizontal_spacing=0.1
+    )
     
-    # 左图：推出（Pushout）
-    # 绘制对象
-    objects_pushout = {
-        'M': (1, 2),
-        'K': (0, 0),
-        'L': (2, 0),
-        'K⊔_M L': (1, -1.5)
-    }
+    # Left: Original complex K
+    vertices_k = np.array([[0.5, 0], [1.5, 0], [1, 0.866]])
+    labels_k = ['a', 'b', 'c']
     
-    for obj, pos in objects_pushout.items():
-        rect = FancyBboxPatch((pos[0]-0.4, pos[1]-0.3), 0.8, 0.6,
-                             boxstyle="round,pad=0.1", 
-                             facecolor='lightblue', edgecolor='blue',
-                             linewidth=2, zorder=3)
-        ax1.add_patch(rect)
-        ax1.text(pos[0], pos[1], obj, ha='center', va='center', 
-                fontsize=10, weight='bold', zorder=4)
+    fig.add_trace(go.Scatter(
+        x=list(vertices_k[:, 0]) + [vertices_k[0, 0]],
+        y=list(vertices_k[:, 1]) + [vertices_k[0, 1]],
+        fill='toself',
+        fillcolor='rgba(100, 150, 255, 0.3)',
+        line=dict(color='blue', width=2),
+        showlegend=False,
+        row=1, col=1
+    ))
+    for i in range(3):
+        fig.add_trace(go.Scatter(
+            x=[vertices_k[i, 0], vertices_k[(i+1)%3, 0]],
+            y=[vertices_k[i, 1], vertices_k[(i+1)%3, 1]],
+            mode='lines',
+            line=dict(color='blue', width=2),
+            showlegend=False,
+            row=1, col=1
+        ))
+    for v, label in zip(vertices_k, labels_k):
+        fig.add_trace(go.Scatter(
+            x=[v[0]], y=[v[1]],
+            mode='markers+text',
+            marker=dict(size=25, color='blue'),
+            text=label,
+            textposition='bottom center',
+            textfont=dict(size=11, color='blue', family='Arial Black'),
+            showlegend=False,
+            row=1, col=1
+        ))
     
-    # 绘制态射（箭头）
-    arrows_pushout = [
-        (objects_pushout['M'], objects_pushout['K'], 'f', 'blue'),
-        (objects_pushout['M'], objects_pushout['L'], 'g', 'blue'),
-        (objects_pushout['K'], objects_pushout['K⊔_M L'], 'ι₁', 'green'),
-        (objects_pushout['L'], objects_pushout['K⊔_M L'], 'ι₂', 'green')
+    # Middle: Transformation arrow (bidirectional)
+    fig.add_annotation(
+        x=1.5, y=0.5,
+        text="Vertex↔Simplex<br>Reversal",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1.5,
+        arrowwidth=3,
+        arrowcolor='red',
+        ax=-0.3, ay=0,
+        font=dict(size=11, color='red', family='Arial Black'),
+        bgcolor='rgba(255, 255, 255, 0.9)',
+        bordercolor='red',
+        borderwidth=2,
+        row=1, col=2
+    )
+    # Add reverse arrow
+    fig.add_annotation(
+        x=0.5, y=0.5,
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1.5,
+        arrowwidth=3,
+        arrowcolor='red',
+        ax=0.3, ay=0,
+        row=1, col=2
+    )
+    
+    # Right: Conjugate complex K*
+    kstar_vertices = [
+        (np.array([0.5, 0.2]), '{a,b}'),
+        (np.array([1.5, 0.2]), '{b,c}'),
+        (np.array([1, 0.866]), '{a,b,c}')
     ]
     
-    for start, end, label, color in arrows_pushout:
-        dx = end[0] - start[0]
-        dy = end[1] - start[1]
-        ax1.arrow(start[0] + 0.1*dx, start[1] + 0.1*dy,
-                 dx*0.8, dy*0.8, head_width=0.15, head_length=0.15,
-                 fc=color, ec=color, linewidth=2, zorder=2)
-        mid_x, mid_y = (start[0] + end[0])/2, (start[1] + end[1])/2
-        offset = 0.2 if 'ι' in label else 0.15
-        ax1.text(mid_x + offset, mid_y + offset, label, 
-                fontsize=9, color=color, weight='bold', zorder=5)
+    for pos, label in kstar_vertices:
+        fig.add_trace(go.Scatter(
+            x=[pos[0]], y=[pos[1]],
+            mode='markers+text',
+            marker=dict(size=30, color='purple'),
+            text=label,
+            textposition='middle center',
+            textfont=dict(size=10, color='white', family='Arial Black'),
+            showlegend=False,
+            row=1, col=3
+        ))
     
-    ax1.set_xlim(-1, 3)
-    ax1.set_ylim(-2.5, 2.5)
-    ax1.set_aspect('equal')
-    ax1.axis('off')
-    ax1.set_title('推出（Pushout）\n$K \sqcup_M L$', fontsize=12, pad=15, weight='bold')
-    
-    # 右图：拉回（Pullback）
-    objects_pullback = {
-        'K': (0, 0),
-        'L': (2, 0),
-        'M': (1, 2),
-        'K×_M L': (1, -1.5)
-    }
-    
-    for obj, pos in objects_pullback.items():
-        rect = FancyBboxPatch((pos[0]-0.4, pos[1]-0.3), 0.8, 0.6,
-                             boxstyle="round,pad=0.1", 
-                             facecolor='lightcoral', edgecolor='red',
-                             linewidth=2, zorder=3)
-        ax2.add_patch(rect)
-        ax2.text(pos[0], pos[1], obj, ha='center', va='center', 
-                fontsize=10, weight='bold', zorder=4)
-    
-    # 绘制态射（箭头）
-    arrows_pullback = [
-        (objects_pullback['K'], objects_pullback['M'], 'f', 'red'),
-        (objects_pullback['L'], objects_pullback['M'], 'g', 'red'),
-        (objects_pullback['K×_M L'], objects_pullback['K'], 'π₁', 'green'),
-        (objects_pullback['K×_M L'], objects_pullback['L'], 'π₂', 'green')
+    edges_kstar = [
+        (kstar_vertices[0][0], kstar_vertices[2][0]),
+        (kstar_vertices[1][0], kstar_vertices[2][0])
     ]
+    for start, end in edges_kstar:
+        fig.add_trace(go.Scatter(
+            x=[start[0], end[0]],
+            y=[start[1], end[1]],
+            mode='lines',
+            line=dict(color='purple', width=2, dash='dash'),
+            showlegend=False,
+            row=1, col=3
+        ))
     
-    for start, end, label, color in arrows_pullback:
-        dx = end[0] - start[0]
-        dy = end[1] - start[1]
-        ax2.arrow(start[0] + 0.1*dx, start[1] + 0.1*dy,
-                 dx*0.8, dy*0.8, head_width=0.15, head_length=0.15,
-                 fc=color, ec=color, linewidth=2, zorder=2)
-        mid_x, mid_y = (start[0] + end[0])/2, (start[1] + end[1])/2
-        offset = 0.2 if 'π' in label else 0.15
-        ax2.text(mid_x + offset, mid_y + offset, label, 
-                fontsize=9, color=color, weight='bold', zorder=5)
+    # Update layout
+    for i in range(1, 4):
+        fig.update_xaxes(range=[-0.3, 2.3], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
+        fig.update_yaxes(range=[-0.5, 1.5], showgrid=False, zeroline=False, 
+                         showticklabels=False, row=1, col=i)
     
-    ax2.set_xlim(-1, 3)
-    ax2.set_ylim(-2.5, 2.5)
-    ax2.set_aspect('equal')
-    ax2.axis('off')
-    ax2.set_title('拉回（Pullback）\n$K \times_M L$', fontsize=12, pad=15, weight='bold')
+    fig.update_layout(
+        title=dict(
+            text='Conjugate Complex Construction: Hypergraph Vertex-Simplex Reversal',
+            x=0.5,
+            font=dict(size=14, family='Arial')
+        ),
+        plot_bgcolor='white',
+        width=1500,
+        height=500,
+        margin=dict(l=20, r=20, t=80, b=20)
+    )
     
-    plt.suptitle('范畴论交换图：推出与拉回', fontsize=14, weight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig('images/figure6_commutative_diagrams.png', dpi=300, bbox_inches='tight')
-    plt.close()
-    print("✓ 生成插图6: 推出和拉回的交换图")
+    fig.write_image('images/figure6_conjugate_transformation.png', width=1500, height=500, scale=2)
+    print("✓ Generated Figure 6: Conjugate Transformation")
 
-# ==================== 主函数 ====================
+# ==================== Main Function ====================
 
 def main():
-    """生成所有插图"""
-    print("开始生成复形范畴笔记插图...")
-    print("=" * 50)
+    """Generate all figures"""
+    print("Starting to generate Simplicial Complex Category figures...")
+    print("=" * 60)
     
-    figure1_simplicial_complex()
-    figure2_bpe_pushout()
-    figure3_inverse_splitting_pullback()
-    figure4_conjugate_complex()
-    figure5_weighted_directed_complex()
-    figure6_commutative_diagrams()
+    # Check for kaleido
+    try:
+        import kaleido
+    except ImportError:
+        print("ERROR: kaleido is required for PNG export!")
+        print("Please install: pip install kaleido")
+        print("Or: conda install -c conda-forge python-kaleido")
+        return
     
-    print("=" * 50)
-    print("✓ 所有插图生成完成！")
-    print(f"图片保存在: {os.path.abspath('images')}")
+    try:
+        figure1_simplicial_complex()
+        figure2_bpe_pushout()
+        figure3_inverse_splitting_pullback()
+        figure4_conjugate_complex()
+        figure5_weighted_directed_complex()
+        figure6_conjugate_transformation()
+        
+        print("=" * 60)
+        print("✓ All figures generated successfully!")
+        print(f"Images saved in: {os.path.abspath('images')}")
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        print("\nIf you see 'kaleido' related errors, please install:")
+        print("  pip install kaleido")
+        print("Or: conda install -c conda-forge python-kaleido")
 
 if __name__ == '__main__':
     main()
