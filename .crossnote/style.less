@@ -10,8 +10,8 @@
   --font-size-section: 13px;
   --font-size-chapter: 16px;
   --font-size-cover-title: 50px;
-  --font-size-cover-subtitle: 40px;
-  --font-size-cover-meta: 30px;
+  --font-size-cover-subtitle: 25px;
+  --font-size-cover-meta: 80px;
   --line-height-body: 1.5;
   
   /* Block Title Sizes - 块标题大小独立设置，大小关系：Chapter > # > section > ## > subsection > ### */
@@ -56,10 +56,47 @@
   --color-proposition: #00bcd4;
   --color-counterexample: #ff5722;
   --color-objective: #ff9800;
+  --color-figure: #ffffff;
   --color-info: #3b82f6;
   --color-warning: #f91616;
   --color-tip: #10b981;
 }
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-list li {
+  line-height: 1.8;
+  position: relative;
+  list-style: none;
+}
+
+.toc-list a {
+  display: block;           /* 改成 block 方便 padding-left 生效 */
+  text-decoration: none;
+  color: black;
+  white-space: nowrap;
+}
+
+.toc-title {
+  display: inline-block;
+}
+
+.toc-leader {
+  border-bottom: 1px dotted #999;
+  flex-grow: 1;
+  display: inline-block;
+  width: 100%;
+  margin-left: 0.5em;
+}
+
+/* 缩进 */
+.toc-h1 a { padding-left: 0em; }
+.toc-h2 a { padding-left: 2em; }
+.toc-h3 a { padding-left: 4em; }
+
 
 /* =====================================================
    Print Color Adjustment (Prince 打印时保留背景色)
@@ -295,7 +332,8 @@
     lemma-counter
     proposition-counter
     counterexample-counter
-    objective-counter;
+    objective-counter
+    figure-counter;
 
   counter-increment: chapter-counter;
   font-size: var(--font-size-chapter);
@@ -323,6 +361,147 @@
   color: #000 !important;
 }
 
+/* =====================================================
+   Appendix / Appendix Section
+===================================================== */
+.markdown-preview blockquote.appendix {
+  counter-reset:
+    appendix-section-counter
+    subsection-counter
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter
+    figure-counter;
+
+  counter-increment: appendix-counter;
+  font-size: var(--font-size-chapter);
+  font-weight: 700;
+  text-align: left;
+  margin: 48px 0 24px 0;
+  padding: 28px 24px;
+  background-color: var(--color-chapter-bg);
+  border: none;
+  border-radius: 6px;
+  page-break-before: always;
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+.markdown-preview blockquote.appendix::before {
+  content: "Appendix " counter(appendix-counter, upper-alpha);
+  display: block;
+  font-weight: 700;
+  font-size: var(--font-size-chapter-title);
+  margin-bottom: 6px;
+  text-align: left;
+  color: #000 !important;
+}
+
+/* =====================================================
+   Preface - 前言，与chapter同级别但独立计数
+===================================================== */
+.markdown-preview blockquote.preface {
+  counter-reset:
+    preface-section-counter
+    subsection-counter
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter
+    figure-counter;
+
+  counter-increment: preface-counter;
+  font-size: var(--font-size-chapter);
+  font-weight: 700;
+  text-align: left;
+  margin: 48px 0 24px 0;
+  padding: 28px 24px;
+  background-color: var(--color-chapter-bg);
+  border: none;
+  border-radius: 6px;
+  page-break-before: always;
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+.markdown-preview blockquote.preface::before {
+  content: "Preface";
+  display: block;
+  font-weight: 700;
+  font-size: var(--font-size-chapter-title);
+  margin-bottom: 6px;
+  text-align: left;
+  color: #000 !important;
+}
+
+/* Preface Section - 前言子块，使用preface独立的计数器 */
+.markdown-preview blockquote.preface-section {
+  counter-reset: 
+    subsection-counter
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter
+    figure-counter;
+  counter-increment: preface-section-counter;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  margin: 32px 0 14px 0;
+  padding: 12px 20px;
+  border: none;
+  background-color: #ffffff;
+  border-radius: 5px;
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+.markdown-preview blockquote.preface-section::before {
+  content: "Section " counter(preface-section-counter);
+  display: block;
+  font-weight: 700;
+  font-size: var(--font-size-section-title);
+  margin-bottom: 6px;
+  text-align: left;
+  color: #000 !important;
+}
+
 .markdown-preview blockquote.section {
   counter-reset: 
     subsection-counter
@@ -338,7 +517,8 @@
     lemma-counter
     proposition-counter
     counterexample-counter
-    objective-counter;
+    objective-counter
+    figure-counter;
   counter-increment: section-counter;
   font-size: var(--font-size-body);
   font-weight: 700;
@@ -364,6 +544,49 @@
   color: #000 !important;
 }
 
+/* Appendix Section - 附录子块，使用appendix独立的计数器 */
+.markdown-preview blockquote.appendix-section {
+  counter-reset: 
+    subsection-counter
+    def-counter
+    thm-counter
+    example-counter
+    remark-counter
+    property-counter
+    algorithm-counter
+    discussion-counter
+    assumption-counter
+    proposal-counter
+    lemma-counter
+    proposition-counter
+    counterexample-counter
+    objective-counter
+    figure-counter;
+  counter-increment: appendix-section-counter;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  margin: 32px 0 14px 0;
+  padding: 12px 20px;
+  border: none;
+  background-color: #ffffff;
+  border-radius: 5px;
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+.markdown-preview blockquote.appendix-section::before {
+  content: "Appendix " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter);
+  display: block;
+  font-weight: 700;
+  font-size: var(--font-size-section-title);
+  margin-bottom: 6px;
+  text-align: left;
+  color: #000 !important;
+}
+
 .markdown-preview blockquote.subsection {
   counter-reset:
     def-counter
@@ -378,7 +601,8 @@
     lemma-counter
     proposition-counter
     counterexample-counter
-    objective-counter;
+    objective-counter
+    figure-counter;
   counter-increment: subsection-counter;
   font-size: var(--font-size-body);
   font-weight: 600;
@@ -402,6 +626,16 @@
   margin-bottom: 6px;
   text-align: left;
   color: #000 !important;
+}
+
+/* Appendix Section 内的 Subsection */
+.markdown-preview blockquote.appendix-section blockquote.subsection::before {
+  content: "Subsection " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter);
+}
+
+/* Preface Section 内的 Subsection */
+.markdown-preview blockquote.preface-section blockquote.subsection::before {
+  content: "Subsection " counter(preface-section-counter) "." counter(subsection-counter);
 }
 
 /* =====================================================
@@ -435,6 +669,7 @@
 .markdown-preview blockquote.proposition { counter-increment: proposition-counter; }
 .markdown-preview blockquote.counterexample { counter-increment: counterexample-counter; }
 .markdown-preview blockquote.objective { counter-increment: objective-counter; }
+.markdown-preview blockquote.figure { counter-increment: figure-counter; }
 
 /* Auto Titles - 根据所在层级自适应编号 */
 /* 在subsection内的块：使用subsection编号 */
@@ -477,6 +712,9 @@
 .markdown-preview blockquote.subsection blockquote.objective::before {
   content: "Objective " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(objective-counter);
 }
+.markdown-preview blockquote.subsection blockquote.figure::before {
+  content: "Figure " counter(chapter-counter) "." counter(section-counter) "." counter(subsection-counter) "." counter(figure-counter);
+}
 
 /* 在section内的块（但不在subsection内）：使用section编号 */
 .markdown-preview blockquote.section > blockquote.definition::before {
@@ -517,6 +755,9 @@
 }
 .markdown-preview blockquote.section > blockquote.objective::before {
   content: "Objective " counter(chapter-counter) "." counter(section-counter) "." counter(objective-counter);
+}
+.markdown-preview blockquote.section > blockquote.figure::before {
+  content: "Figure " counter(chapter-counter) "." counter(section-counter) "." counter(figure-counter);
 }
 
 /* 在chapter内的块（但不在section内）：使用chapter编号（默认情况） */
@@ -559,6 +800,273 @@
 .markdown-preview blockquote.chapter > blockquote.objective::before {
   content: "Objective " counter(chapter-counter) "." counter(objective-counter);
 }
+.markdown-preview blockquote.chapter > blockquote.figure::before {
+  content: "Figure " counter(chapter-counter) "." counter(figure-counter);
+}
+
+/* 在appendix-section内的块（但不在subsection内）：使用appendix-section编号 */
+.markdown-preview blockquote.appendix-section > blockquote.definition::before {
+  content: "Definition " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.theorem::before {
+  content: "Theorem " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.example::before {
+  content: "Example " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.remark::before {
+  content: "Remark " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.property::before {
+  content: "Property " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.algorithm::before {
+  content: "Algorithm " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.discussion::before {
+  content: "Discussion " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.assumption::before {
+  content: "Assumption " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.proposal::before {
+  content: "Proposal " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.lemma::before {
+  content: "Lemma " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.proposition::before {
+  content: "Proposition " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.counterexample::before {
+  content: "Counterexample " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.objective::before {
+  content: "Objective " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(objective-counter);
+}
+.markdown-preview blockquote.appendix-section > blockquote.figure::before {
+  content: "Figure " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(figure-counter);
+}
+
+/* 在appendix-section内的subsection内的块：使用appendix-subsection编号 */
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.definition::before {
+  content: "Definition " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.theorem::before {
+  content: "Theorem " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.example::before {
+  content: "Example " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.remark::before {
+  content: "Remark " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.property::before {
+  content: "Property " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.algorithm::before {
+  content: "Algorithm " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.discussion::before {
+  content: "Discussion " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.assumption::before {
+  content: "Assumption " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.proposal::before {
+  content: "Proposal " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.lemma::before {
+  content: "Lemma " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.proposition::before {
+  content: "Proposition " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.counterexample::before {
+  content: "Counterexample " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.objective::before {
+  content: "Objective " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(objective-counter);
+}
+.markdown-preview blockquote.appendix-section blockquote.subsection blockquote.figure::before {
+  content: "Figure " counter(appendix-counter, upper-alpha) "." counter(appendix-section-counter) "." counter(subsection-counter) "." counter(figure-counter);
+}
+
+/* 在appendix内的块（但不在appendix-section内）：使用appendix编号 */
+.markdown-preview blockquote.appendix > blockquote.definition::before {
+  content: "Definition " counter(appendix-counter, upper-alpha) "." counter(def-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.theorem::before {
+  content: "Theorem " counter(appendix-counter, upper-alpha) "." counter(thm-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.example::before {
+  content: "Example " counter(appendix-counter, upper-alpha) "." counter(example-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.remark::before {
+  content: "Remark " counter(appendix-counter, upper-alpha) "." counter(remark-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.property::before {
+  content: "Property " counter(appendix-counter, upper-alpha) "." counter(property-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.algorithm::before {
+  content: "Algorithm " counter(appendix-counter, upper-alpha) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.discussion::before {
+  content: "Discussion " counter(appendix-counter, upper-alpha) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.assumption::before {
+  content: "Assumption " counter(appendix-counter, upper-alpha) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.proposal::before {
+  content: "Proposal " counter(appendix-counter, upper-alpha) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.lemma::before {
+  content: "Lemma " counter(appendix-counter, upper-alpha) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.proposition::before {
+  content: "Proposition " counter(appendix-counter, upper-alpha) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.counterexample::before {
+  content: "Counterexample " counter(appendix-counter, upper-alpha) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.objective::before {
+  content: "Objective " counter(appendix-counter, upper-alpha) "." counter(objective-counter);
+}
+.markdown-preview blockquote.appendix > blockquote.figure::before {
+  content: "Figure " counter(appendix-counter, upper-alpha) "." counter(figure-counter);
+}
+
+/* 在preface-section内的块（但不在subsection内）：使用preface-section编号 */
+.markdown-preview blockquote.preface-section > blockquote.definition::before {
+  content: "Definition " counter(preface-section-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.theorem::before {
+  content: "Theorem " counter(preface-section-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.example::before {
+  content: "Example " counter(preface-section-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.remark::before {
+  content: "Remark " counter(preface-section-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.property::before {
+  content: "Property " counter(preface-section-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.algorithm::before {
+  content: "Algorithm " counter(preface-section-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.discussion::before {
+  content: "Discussion " counter(preface-section-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.assumption::before {
+  content: "Assumption " counter(preface-section-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.proposal::before {
+  content: "Proposal " counter(preface-section-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.lemma::before {
+  content: "Lemma " counter(preface-section-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.proposition::before {
+  content: "Proposition " counter(preface-section-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.counterexample::before {
+  content: "Counterexample " counter(preface-section-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.objective::before {
+  content: "Objective " counter(preface-section-counter) "." counter(objective-counter);
+}
+.markdown-preview blockquote.preface-section > blockquote.figure::before {
+  content: "Figure " counter(preface-section-counter) "." counter(figure-counter);
+}
+
+/* 在preface-section内的subsection内的块：使用preface-subsection编号 */
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.definition::before {
+  content: "Definition " counter(preface-section-counter) "." counter(subsection-counter) "." counter(def-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.theorem::before {
+  content: "Theorem " counter(preface-section-counter) "." counter(subsection-counter) "." counter(thm-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.example::before {
+  content: "Example " counter(preface-section-counter) "." counter(subsection-counter) "." counter(example-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.remark::before {
+  content: "Remark " counter(preface-section-counter) "." counter(subsection-counter) "." counter(remark-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.property::before {
+  content: "Property " counter(preface-section-counter) "." counter(subsection-counter) "." counter(property-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.algorithm::before {
+  content: "Algorithm " counter(preface-section-counter) "." counter(subsection-counter) "." counter(algorithm-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.discussion::before {
+  content: "Discussion " counter(preface-section-counter) "." counter(subsection-counter) "." counter(discussion-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.assumption::before {
+  content: "Assumption " counter(preface-section-counter) "." counter(subsection-counter) "." counter(assumption-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.proposal::before {
+  content: "Proposal " counter(preface-section-counter) "." counter(subsection-counter) "." counter(proposal-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.lemma::before {
+  content: "Lemma " counter(preface-section-counter) "." counter(subsection-counter) "." counter(lemma-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.proposition::before {
+  content: "Proposition " counter(preface-section-counter) "." counter(subsection-counter) "." counter(proposition-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.counterexample::before {
+  content: "Counterexample " counter(preface-section-counter) "." counter(subsection-counter) "." counter(counterexample-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.objective::before {
+  content: "Objective " counter(preface-section-counter) "." counter(subsection-counter) "." counter(objective-counter);
+}
+.markdown-preview blockquote.preface-section blockquote.subsection blockquote.figure::before {
+  content: "Figure " counter(preface-section-counter) "." counter(subsection-counter) "." counter(figure-counter);
+}
+
+/* 在preface内的块（但不在preface-section内）：使用preface编号 */
+.markdown-preview blockquote.preface > blockquote.definition::before {
+  content: "Definition " counter(def-counter);
+}
+.markdown-preview blockquote.preface > blockquote.theorem::before {
+  content: "Theorem " counter(thm-counter);
+}
+.markdown-preview blockquote.preface > blockquote.example::before {
+  content: "Example " counter(example-counter);
+}
+.markdown-preview blockquote.preface > blockquote.remark::before {
+  content: "Remark " counter(remark-counter);
+}
+.markdown-preview blockquote.preface > blockquote.property::before {
+  content: "Property " counter(property-counter);
+}
+.markdown-preview blockquote.preface > blockquote.algorithm::before {
+  content: "Algorithm " counter(algorithm-counter);
+}
+.markdown-preview blockquote.preface > blockquote.discussion::before {
+  content: "Discussion " counter(discussion-counter);
+}
+.markdown-preview blockquote.preface > blockquote.assumption::before {
+  content: "Assumption " counter(assumption-counter);
+}
+.markdown-preview blockquote.preface > blockquote.proposal::before {
+  content: "Proposal " counter(proposal-counter);
+}
+.markdown-preview blockquote.preface > blockquote.lemma::before {
+  content: "Lemma " counter(lemma-counter);
+}
+.markdown-preview blockquote.preface > blockquote.proposition::before {
+  content: "Proposition " counter(proposition-counter);
+}
+.markdown-preview blockquote.preface > blockquote.counterexample::before {
+  content: "Counterexample " counter(counterexample-counter);
+}
+.markdown-preview blockquote.preface > blockquote.objective::before {
+  content: "Objective " counter(objective-counter);
+}
+.markdown-preview blockquote.preface > blockquote.figure::before {
+  content: "Figure " counter(figure-counter);
+}
 
 .markdown-preview blockquote.proof::before { content: "Proof."; }
 
@@ -576,6 +1084,7 @@
 .markdown-preview blockquote.proposition::before,
 .markdown-preview blockquote.counterexample::before,
 .markdown-preview blockquote.objective::before,
+.markdown-preview blockquote.figure::before,
 .markdown-preview blockquote.proof::before {
   display: block;
   margin-bottom: 6px;
@@ -598,7 +1107,8 @@
 .markdown-preview blockquote.lemma,
 .markdown-preview blockquote.proposition,
 .markdown-preview blockquote.counterexample,
-.markdown-preview blockquote.objective {
+.markdown-preview blockquote.objective,
+.markdown-preview blockquote.figure {
   font-size: var(--font-size-body);
 }
 
@@ -744,6 +1254,143 @@
   -webkit-print-color-adjust: exact !important;
   -prince-color-adjust: exact !important;
   color-adjust: exact !important;
+}
+.markdown-preview blockquote.figure { 
+  background: linear-gradient(to bottom, #fafbfc 0%, #f5f7f9 100%);
+  font-size: var(--font-size-body);
+  margin: 16px 0;
+  padding: 20px 24px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+  /* Prince 打印时保留背景色 */
+  print-color-adjust: exact !important;
+  -webkit-print-color-adjust: exact !important;
+  -prince-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+/* Figure 块标题样式优化 */
+.markdown-preview blockquote.figure::before {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: var(--font-size-block-title);
+  color: #374151 !important;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Figure 块内的图片自适应布局 - 美化 */
+.markdown-preview blockquote.figure img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 12px auto;
+  border-radius: 6px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.markdown-preview blockquote.figure img:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.markdown-preview blockquote.figure p {
+  margin: 8px 0 4px 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: var(--font-size-small);
+  line-height: 1.6;
+}
+
+.markdown-preview blockquote.figure p:first-of-type {
+  margin-top: 0;
+}
+
+.markdown-preview blockquote.figure p:last-of-type {
+  margin-bottom: 0;
+}
+
+.markdown-preview blockquote.figure p img {
+  margin: 12px auto;
+}
+
+.markdown-preview blockquote.figure > img {
+  margin: 12px 0;
+}
+
+/* Figure 块内的其他内容样式 */
+.markdown-preview blockquote.figure > *:not(img):not(::before) {
+  margin: 8px 0;
+}
+
+/* 打印时移除hover效果和阴影 */
+@media print {
+  .markdown-preview blockquote.figure {
+    box-shadow: none;
+    background: #fafbfc;
+  }
+  .markdown-preview blockquote.figure img {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .markdown-preview blockquote.figure img:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* =====================================================
+   Color Block - 用于更改包裹字体的颜色
+===================================================== */
+.markdown-preview blockquote.color {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* Color块内的所有文本继承颜色 */
+.markdown-preview blockquote.color,
+.markdown-preview blockquote.color * {
+  color: inherit;
+}
+
+/* 预定义颜色类 */
+.markdown-preview blockquote.color.red,
+.markdown-preview blockquote.color.red * {
+  color: #f44336 !important;
+}
+.markdown-preview blockquote.color.blue,
+.markdown-preview blockquote.color.blue * {
+  color: #2196f3 !important;
+}
+.markdown-preview blockquote.color.green,
+.markdown-preview blockquote.color.green * {
+  color: #4caf50 !important;
+}
+.markdown-preview blockquote.color.orange,
+.markdown-preview blockquote.color.orange * {
+  color: #ff9800 !important;
+}
+.markdown-preview blockquote.color.purple,
+.markdown-preview blockquote.color.purple * {
+  color: #9c27b0 !important;
+}
+.markdown-preview blockquote.color.gray,
+.markdown-preview blockquote.color.gray * {
+  color: #757575 !important;
+}
+.markdown-preview blockquote.color.black,
+.markdown-preview blockquote.color.black * {
+  color: #000000 !important;
 }
 
 /* =====================================================
